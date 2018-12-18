@@ -1,6 +1,7 @@
 # Project files #
 ###################
 cache
+vendor
 server
 homedir
 installdir
