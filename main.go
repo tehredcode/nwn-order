@@ -21,7 +21,7 @@ import (
 type config struct {
 	RedisPort        string `env:"NWN_ORDER_REDIS_PORT" envDefault:"6379"`
 	OrderPort        string `env:"NWN_ORDER_PORT" envDefault:"5750"`
-	HbVerbose        bool   `env:"NWN_ORDER_HB_VERBOSE" envDefault:"true"`
+	HbVerbose        bool   `env:"NWN_ORDER_HB_VERBOSE" envDefault:"false"`
 	HbOneMinute      bool   `env:"NWN_ORDER_HB_ONE_MINUTE" envDefault:"true"`
 	HbFiveMinute     bool   `env:"NWN_ORDER_HB_FIVE_MINUTE" envDefault:"true"`
 	HbThirtyMinute   bool   `env:"NWN_ORDER_HB_THIRTY_MINUTE" envDefault:"true"`
@@ -120,7 +120,7 @@ func sendPubsub(LogMessage string, PubsubChannel string, PubsubMessage string) {
 	}
 }
 
-func heartbeatWebhook(ticker string) {
+func heartbeatWebhook(ticker string, verbose bool) {
 	t := time.Now()
 	msg := ("O [" + t.Format("15:04:05") + "] [NWN_Order] Pubsub Event: channel=heartbeat message=" + ticker)
 	sendPubsub(msg, "heartbeat", ticker)
