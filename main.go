@@ -15,6 +15,38 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type config struct {
+	RedisPort        string `env:"NWN_ORDER_REDIS_PORT" envDefault:"6379"`
+	OrderPort        string `env:"NWN_ORDER_PORT" envDefault:"5750"`
+	HbVerbose        bool   `env:"NWN_ORDER_HB_VERBOSE" envDefault:"true"`
+	HbOneMinute      bool   `env:"NWN_ORDER_HB_ONE_MINUTE" envDefault:"true"`
+	HbFiveMinute     bool   `env:"NWN_ORDER_HB_FIVE_MINUTE" envDefault:"true"`
+	HbThirtyMinute   bool   `env:"NWN_ORDER_HB_THIRTY_MINUTE" envDefault:"true"`
+	HbOneHour        bool   `env:"NWN_ORDER_HB_ONE_HOUR" envDefault:"true"`
+	HbSixHour        bool   `env:"NWN_ORDER_HB_SIX_HOUR" envDefault:"true"`
+	HbTwelveHour     bool   `env:"NWN_ORDER_HB_TWELVE_HOUR" envDefault:"true"`
+	HbTwentyfourHour bool   `env:"NWN_ORDER_HB_TWENTYFOUR_HOUR" envDefault:"true"`
+}
+
+func webpage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello world!")
+}
+
+func webserver() {
+	cfg := config{}
+	err := env.Parse(&cfg)
+	if err != nil {
+		fmt.Printf("%+v\n", err)
+	}
+
+	http.HandleFunc("/webhook", githubWebhook)
+	t := time.Now()
+	fmt.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: webserver started :" + cfg.OrderPort + ". webhooks need to be sent to localhost:" + cfg.OrderPort + "/webhook")
+
+	http.HandleFunc("/", webpage)
+	log.Fatal(http.ListenAndServe(":"+cfg.OrderPort, nil))
+}
+
 var (
 	//RedisClient is a var
 	RedisClient *redis.Client
@@ -175,6 +207,7 @@ func main() {
 		c.AddFunc("@every 24h", func() { sendPubsub("Heartbeat", "heartbeat", "1440") })
 	}
 	log.WithFields(log.Fields{"Heartbeat": "1440", "Enabled": cfg.HbTwentyfourHour}).Info("Heartbeat")
+
 	c.Start()
 
 }
