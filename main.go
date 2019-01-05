@@ -48,7 +48,15 @@ func githubWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func boot() {
+func main() {
+	log.SetFormatter(&log.TextFormatter{
+		FullTimestamp: true,
+	})
+
+	log.WithFields(log.Fields{
+		"boot": "started",
+	}).Info("Order has Started")
+
 	cfg := config{}
 	err := env.Parse(&cfg)
 	if err != nil {
@@ -124,18 +132,6 @@ func boot() {
 		gocron.Every(24).Hours().Do(heartbeatWebhook, "1440")
 	}
 	log.WithFields(log.Fields{"Heartbeat": "1440", "Enabled": cfg.HbTwentyfourHour}).Info("Heartbeat")
-}
-
-func main() {
-	log.SetFormatter(&log.TextFormatter{
-		FullTimestamp: true,
-	})
-
-	log.WithFields(log.Fields{
-		"boot": "started",
-	}).Info("Order has Started")
-
-	go boot()
 
 	<-gocron.Start()
 }
