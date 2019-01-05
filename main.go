@@ -83,19 +83,19 @@ func main() {
 
 	log.WithFields(log.Fields{
 		"Redis": "1",
-	}).Fatal("Redis connected")
+	}).Info("Redis connected")
 
 	// start pubsub
 	go startPubsub()
 	log.WithFields(log.Fields{
 		"Pubsub": "1",
-	}).Fatal("Pubsub started")
+	}).Info("Pubsub started")
 
 	// start webhook reciever
 	go webserver()
 	log.WithFields(log.Fields{
 		"Webserver": "1",
-	}).Fatal("Webserver started")
+	}).Info("Webserver started")
 
 	// start the heartbeat timers
 	if cfg.HbOneMinute == true {
