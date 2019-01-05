@@ -5,15 +5,14 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/caarlos0/env"
+	"github.com/go-redis/redis"
 	"github.com/google/go-github/github"
-	"github.com/jasonlvhit/gocron"
+	"github.com/robfig/cron"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -52,7 +51,7 @@ func startPubsub() {
 	}
 }
 
-func sendPubsub(LogMessage string, PubsubChannel string, PubsubMessage string) {
+func sendPubsub(pubsubType string, PubsubChannel string, PubsubMessage string) {
 	cfg := config{}
 	err := env.Parse(&cfg)
 
@@ -69,16 +68,8 @@ func sendPubsub(LogMessage string, PubsubChannel string, PubsubMessage string) {
 		panic(err)
 	}
 
-	if cfg.HbVerbose == true {
-		fmt.Println(LogMessage)
-	}
-}
+	log.WithFields(log.Fields{"Pubsub": pubsubType, "Pubsub Channel": PubsubChannel, "Pubsub Message": PubsubMessage}).Info("Heartbeat")
 
-
-func heartbeatWebhook(ticker string, verbose bool) {
-	t := time.Now()
-	msg := ("O [" + t.Format("15:04:05") + "] [NWN_Order] Pubsub Event: channel=heartbeat message=" + ticker)
-	sendPubsub(msg, "heartbeat", ticker)
 }
 
 func githubWebhook(w http.ResponseWriter, r *http.Request) {
@@ -134,7 +125,6 @@ func main() {
 			log.WithFields(log.Fields{
 				"Redis": "0",
 			}).Fatal("Redis not connected")
-			os.Exit(1)
 		}
 		time.Sleep(5 * time.Second)
 	}
@@ -156,41 +146,35 @@ func main() {
 		"Webserver": "1",
 	}).Info("Webserver started")
 
-	// start the heartbeat timers
+	c := cron.New()
 	if cfg.HbOneMinute == true {
-		gocron.Every(1).Minute().Do(heartbeatWebhook, "1")
+		c.AddFunc("@every 1m", func() { sendPubsub("Heartbeat", "heartbeat", "1") })
 	}
 	log.WithFields(log.Fields{"Heartbeat": "1", "Enabled": cfg.HbOneMinute}).Info("Heartbeat")
-
 	if cfg.HbFiveMinute == true {
-		gocron.Every(5).Minutes().Do(heartbeatWebhook, "5")
+		c.AddFunc("@every 5m", func() { sendPubsub("Heartbeat", "heartbeat", "5") })
 	}
 	log.WithFields(log.Fields{"Heartbeat": "5", "Enabled": cfg.HbFiveMinute}).Info("Heartbeat")
-
 	if cfg.HbThirtyMinute == true {
-		gocron.Every(30).Minutes().Do(heartbeatWebhook, "30")
+		c.AddFunc("@every 30m", func() { sendPubsub("Heartbeat", "heartbeat", "30") })
 	}
 	log.WithFields(log.Fields{"Heartbeat": "30", "Enabled": cfg.HbThirtyMinute}).Info("Heartbeat")
-
 	if cfg.HbOneHour == true {
-		gocron.Every(1).Hour().Do(heartbeatWebhook, "60")
+		c.AddFunc("@every 1h", func() { sendPubsub("Heartbeat", "heartbeat", "60") })
 	}
-	log.WithFields(log.Fields{"Heartbeat": "360", "Enabled": cfg.HbOneHour}).Info("Heartbeat")
-
+	log.WithFields(log.Fields{"Heartbeat": "60", "Enabled": cfg.HbOneHour}).Info("Heartbeat")
 	if cfg.HbSixHour == true {
-		gocron.Every(6).Hours().Do(heartbeatWebhook, "360")
+		c.AddFunc("@every 6h", func() { sendPubsub("Heartbeat", "heartbeat", "360") })
 	}
 	log.WithFields(log.Fields{"Heartbeat": "360", "Enabled": cfg.HbSixHour}).Info("Heartbeat")
-
 	if cfg.HbTwelveHour == true {
-		gocron.Every(12).Hours().Do(heartbeatWebhook, "720")
+		c.AddFunc("@every 12h", func() { sendPubsub("Heartbeat", "heartbeat", "720") })
 	}
 	log.WithFields(log.Fields{"Heartbeat": "720", "Enabled": cfg.HbTwelveHour}).Info("Heartbeat")
-
 	if cfg.HbTwentyfourHour == true {
-		gocron.Every(24).Hours().Do(heartbeatWebhook, "1440")
+		c.AddFunc("@every 24h", func() { sendPubsub("Heartbeat", "heartbeat", "1440") })
 	}
 	log.WithFields(log.Fields{"Heartbeat": "1440", "Enabled": cfg.HbTwentyfourHour}).Info("Heartbeat")
+	c.Start()
 
-	<-gocron.Start()
 }
