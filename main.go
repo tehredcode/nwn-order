@@ -4,18 +4,18 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
 
+	"github.com/robfig/cron"
 	"github.com/caarlos0/env"
 	"github.com/glendc/go-external-ip"
 	"github.com/go-redis/redis"
 	"github.com/google/go-github/github"
-	"github.com/jasonlvhit/gocron"
+	log "github.com/sirupsen/logrus"
 )
 
 type config struct {
@@ -115,9 +115,7 @@ func sendPubsub(LogMessage string, PubsubChannel string, PubsubMessage string) {
 		panic(err)
 	}
 
-	if cfg.HbVerbose == true {
-		fmt.Println(LogMessage)
-	}
+	fmt.Println(LogMessage)
 }
 
 func heartbeatWebhook(ticker string, verbose bool) {
@@ -176,6 +174,18 @@ func webserver() {
 }
 
 func main() {
+    done := make(chan bool)
+	go initMain()
+    <-done // Block forever
+}
+
+func initMain() {
+	cfg := config{}
+	err := env.Parse(&cfg)
+	if err != nil {
+		fmt.Printf("%+v\n", err)
+	}
+
 	t := time.Now()
 	log.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: Order has Started")
 
@@ -202,65 +212,39 @@ func main() {
 	go webserver()
 	fmt.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: Webserver started")
 
-	// initial heartbeat
-	// initial uuid
-	go uuidGeneration()
+	c := cron.New()
+    if cfg.HbOneMinute == true {
+        c.AddFunc("@every 1m", func() { sendPubsub("Heartbeat", "heartbeat", "1") })
+    }
+    log.WithFields(log.Fields{"Heartbeat": "1", "Enabled": cfg.HbOneMinute}).Info("Heartbeat")
+    if cfg.HbFiveMinute == true {
+        c.AddFunc("@every 5m", func() { sendPubsub("Heartbeat", "heartbeat", "5") })
+    }
+    log.WithFields(log.Fields{"Heartbeat": "5", "Enabled": cfg.HbFiveMinute}).Info("Heartbeat")
+    if cfg.HbThirtyMinute == true {
+        c.AddFunc("@every 30m", func() { sendPubsub("Heartbeat", "heartbeat", "30") })
+    }
+    log.WithFields(log.Fields{"Heartbeat": "30", "Enabled": cfg.HbThirtyMinute}).Info("Heartbeat")
+    if cfg.HbOneHour == true {
+        c.AddFunc("@every 1h", func() { sendPubsub("Heartbeat", "heartbeat", "60") })
+    }
+    log.WithFields(log.Fields{"Heartbeat": "60", "Enabled": cfg.HbOneHour}).Info("Heartbeat")
+    if cfg.HbSixHour == true {
+        c.AddFunc("@every 6h", func() { sendPubsub("Heartbeat", "heartbeat", "360") })
+    }
+    log.WithFields(log.Fields{"Heartbeat": "360", "Enabled": cfg.HbSixHour}).Info("Heartbeat")
+    if cfg.HbTwelveHour == true {
+        c.AddFunc("@every 12h", func() { sendPubsub("Heartbeat", "heartbeat", "720") })
+    }
+    log.WithFields(log.Fields{"Heartbeat": "720", "Enabled": cfg.HbTwelveHour}).Info("Heartbeat")
+    if cfg.HbTwentyfourHour == true {
+        c.AddFunc("@every 24h", func() { sendPubsub("Heartbeat", "heartbeat", "1440") })
+    }
+    log.WithFields(log.Fields{"Heartbeat": "1440", "Enabled": cfg.HbTwentyfourHour}).Info("Heartbeat")
+	c.Start()
 
-	cfg := config{}
-	err = env.Parse(&cfg)
-
-	if err != nil {
-		fmt.Printf("%+v\n", err)
-	}
-
-	// start the heartbeat timers
-	if cfg.HbOneMinute == true {
-		fmt.Println("0 [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: heartbeat enabled:  1 minute")
-		gocron.Every(1).Minute().Do(heartbeatWebhook, "1")
-	} else {
-		fmt.Println("0 [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: heartbeat disabled: 1 minute")
-	}
-	if cfg.HbFiveMinute == true {
-		fmt.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: heartbeat enabled:  5 minutes")
-		gocron.Every(5).Minutes().Do(heartbeatWebhook, "5")
-	} else {
-		fmt.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: heartbeat disabled: 5 minutes")
-	}
-	if cfg.HbThirtyMinute == true {
-		fmt.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: heartbeat enabled:  30 minutes")
-		gocron.Every(30).Minutes().Do(heartbeatWebhook, "30")
-	} else {
-		fmt.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: heartbeat disabled: 30 minutes")
-	}
-	if cfg.HbOneHour == true {
-		fmt.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: heartbeat enabled:  1 hour")
-		gocron.Every(1).Hour().Do(heartbeatWebhook, "60")
-	} else {
-		fmt.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: heartbeat disabled: 1 hour")
-	}
-	if cfg.HbSixHour == true {
-		fmt.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: heartbeat enabled:  6 hours")
-		gocron.Every(6).Hours().Do(heartbeatWebhook, "360")
-	} else {
-		fmt.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: heartbeat disabled: 6 hours")
-	}
-	if cfg.HbTwelveHour == true {
-		fmt.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: heartbeat enabled:  12 hours")
-		gocron.Every(12).Hours().Do(heartbeatWebhook, "720")
-	} else {
-		fmt.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: heartbeat disabled: 12 hours")
-	}
-	if cfg.HbTwentyfourHour == true {
-		fmt.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: heartbeat enabled:  24 hours")
-		gocron.Every(24).Hours().Do(heartbeatWebhook, "1440")
-	} else {
-		fmt.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event:heartbeat disabled: 24 hours")
-	}
-	if cfg.HbVerbose == true {
-		fmt.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: Verbose mode: on")
-	} else {
-		fmt.Println("O [" + t.Format("15:04:05") + "] [NWN_Order] Boot Event: Verbose mode: off")
-	}
-
-	<-gocron.Start()
+	for {
+        fmt.Printf("%v+\n", time.Now())
+        time.Sleep(time.Second)
+    }
 }
