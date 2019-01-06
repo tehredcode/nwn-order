@@ -166,12 +166,11 @@ func recieveWebhook(w http.ResponseWriter, r *http.Request) {
 	switch e := event.(type) {
 
 	case *github.PushEvent:
-		t := time.Now()
-		msg := ("O [" + t.Format("15:04:05") + "] [NWN_Order] Webhook Event: channel=innwserver message=repoupdate | " + *e.Sender.Login + " made a commit to module repo")
-		go sendPubsub(msg, "github", "commit")
+		log.WithFields(log.Fields{"Webhook Received": "Github", "Commit": e.HeadCommit.GetID, "Repo": e.GetRepo(), "Contributor": e.GetPusher()}).Info("Github:Commit")
+		go sendPubsub("Github", "Commit", strconv.FormatInt(e.GetPushID(), 10))
 
 	default:
-		fmt.Printf("Only push events supported, unknown webhook event type %s\n", github.WebHookType(r))
+		log.WithFields(log.Fields{"Webhook Received": "Github", "Event": github.WebHookType(r), "Supported": "0"}).Warn("Github:Commit")
 		return
 	}
 }
