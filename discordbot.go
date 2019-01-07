@@ -15,7 +15,9 @@ var (
 )
 
 func initDiscord() {
-	discord, err := discordgo.New("Bot " + os.Getenv("DiscordBotKey"))
+	botkey := os.Getenv("DiscordBotKey")
+	log.WithFields(log.Fields{"BotKey": botkey}).Info("Order:Discord:Status")
+	discord, err := discordgo.New("Bot " + botkey)
 	errCheck("error creating discord session", err)
 	user, err := discord.User("@me")
 	errCheck("error retrieving account", err)
