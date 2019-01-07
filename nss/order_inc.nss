@@ -5,9 +5,6 @@
 #include "order_heartbeat"
 #include "order_return"
 
-#include "_save"
-#include "_log"
-
 string RdsEdgePlayer(string sEdgeType,object oPC);
 string RdsEdgePlayer(string sEdgeType,object oPC) {
   string Nwserver = GetModuleName();

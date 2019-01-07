@@ -1,6 +1,7 @@
 module github.com/urothis/nwn-order
 
 require (
+	github.com/bwmarrin/discordgo v0.19.0
 	github.com/caarlos0/env v3.5.0+incompatible
 	github.com/go-redis/redis v6.14.2+incompatible
 	github.com/google/go-github v17.0.0+incompatible

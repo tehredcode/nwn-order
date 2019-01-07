@@ -18,6 +18,7 @@ import (
 type config struct {
 	RedisPort        string `env:"NWN_ORDER_REDIS_PORT" envDefault:"6379"`
 	OrderPort        string `env:"NWN_ORDER_PORT" envDefault:"5750"`
+	DiscordBotKey    string `env:"NWN_ORDER_DISCORD_BOT_KEY" envDefault:"tiddies"`
 	HbVerbose        bool   `env:"NWN_ORDER_HB_VERBOSE" envDefault:"false"`
 	HbOneMinute      bool   `env:"NWN_ORDER_HB_ONE_MINUTE" envDefault:"true"`
 	HbFiveMinute     bool   `env:"NWN_ORDER_HB_FIVE_MINUTE" envDefault:"true"`
@@ -42,6 +43,8 @@ func initMain() {
 	}
 
 	log.WithFields(log.Fields{"Booted": 1}).Info("Order")
+
+	go initDiscord(cfg.DiscordBotKey)
 
 	S := 0
 	conn, err := net.Dial("udp", "redis:6379")
@@ -152,14 +155,14 @@ func sendPubsub(LogMessage string, PubsubChannel string, PubsubMessage string) {
 func recieveWebhook(w http.ResponseWriter, r *http.Request) {
 	payload, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Printf("error validating request body: err=%s\n", err)
+		log.WithFields(log.Fields{"Webhook received": "1", "request body": err}).Warn("Github:Commit:Error")
 		return
 	}
 	defer r.Body.Close()
 
 	event, err := github.ParseWebHook(github.WebHookType(r), payload)
 	if err != nil {
-		fmt.Printf("could not parse webhook: err=%s\n", err)
+		log.WithFields(log.Fields{"Webhook received": err, "Parsed": "0"}).Warn("Github:Commit:Error")
 		return
 	}
 
@@ -183,7 +186,7 @@ func webserver() {
 	}
 
 	http.HandleFunc("/webhook", recieveWebhook)
-	log.WithFields(log.Fields{"Started": 1, "Port": cfg.OrderPort}).Info("Order:Webserver")
+	log.WithFields(log.Fields{"Started": 1, "Port": cfg.OrderPort, "path": "/webhook"}).Info("Order:Webserver")
 
 	http.ListenAndServe(":"+cfg.OrderPort, nil)
 }
@@ -191,5 +194,5 @@ func webserver() {
 func main() {
 	done := make(chan bool)
 	go initMain()
-	<-done // Block forever
+	<-done // Block forever, not sure if this is best practice.
 }
