@@ -44,7 +44,7 @@ func initMain() {
 
 	log.WithFields(log.Fields{"Booted": 1}).Info("Order")
 
-	go initDiscord()
+	go initDiscord(cfg.DiscordBotKey)
 
 	S := 0
 	conn, err := net.Dial("udp", "redis:6379")

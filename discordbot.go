@@ -1,9 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
 )
@@ -14,10 +11,9 @@ var (
 	botKey        string
 )
 
-func initDiscord() {
-	botkey := os.Getenv("DiscordBotKey")
-	log.WithFields(log.Fields{"BotKey": botkey}).Info("Order:Discord:Status")
-	discord, err := discordgo.New("Bot " + botkey)
+func initDiscord(k string) {
+	log.WithFields(log.Fields{"BotKey": k}).Info("Order:Discord:Status")
+	discord, err := discordgo.New("Bot " + k)
 	errCheck("error creating discord session", err)
 	user, err := discord.User("@me")
 	errCheck("error retrieving account", err)
@@ -25,7 +21,7 @@ func initDiscord() {
 	botID = user.ID
 	discord.AddHandler(commandHandler)
 	discord.AddHandler(func(discord *discordgo.Session, ready *discordgo.Ready) {
-		err = discord.UpdateStatus(0, "Order is coming")
+		err = discord.UpdateStatus(0, "Order")
 		if err != nil {
 			log.WithFields(log.Fields{"Set Status": "0"}).Info("Order:Discord:Error")
 		}
@@ -56,7 +52,5 @@ func commandHandler(discord *discordgo.Session, message *discordgo.MessageCreate
 		return
 	}
 
-	content := message.Content
-	fmt.Printf(content)
-	fmt.Printf("Message: %+v || From: %s\n", message.Message, message.Author)
+	log.WithFields(log.Fields{"Message Content": message.Content, "Message": message.Message, "Author": message.Author}).Info("Order:Discord:Message")
 }
