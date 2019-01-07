@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
@@ -13,8 +14,8 @@ var (
 	botKey        string
 )
 
-func initDiscord(BotKey string) {
-	discord, err := discordgo.New("Bot " + BotKey) //BotKey)
+func initDiscord() {
+	discord, err := discordgo.New("Bot " + os.Getenv("DiscordBotKey"))
 	errCheck("error creating discord session", err)
 	user, err := discord.User("@me")
 	errCheck("error retrieving account", err)
