@@ -13,7 +13,7 @@ LABEL maintainer "urothis@gmail.com"
 COPY --from=nwn-order-builder /usr/local/bin/order /usr/local/bin/order
 RUN apt-get update \
     && apt-get upgrade -y \
-    && apt-get install openssl libssl-dev -y\
+    && apt-get install ca-certificates -y\
     && apt-get clean \
     && chmod +x ./usr/local/bin/order
 ENTRYPOINT [ "order" ]
