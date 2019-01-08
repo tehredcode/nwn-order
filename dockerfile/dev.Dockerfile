@@ -15,5 +15,6 @@ RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install ca-certificates -y\
     && apt-get clean \
+    && mkdir logs \
     && chmod +x ./usr/local/bin/order
 ENTRYPOINT [ "order" ]
