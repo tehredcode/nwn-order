@@ -11,48 +11,56 @@ import (
 	"github.com/caarlos0/env"
 	"github.com/go-redis/redis"
 	"github.com/google/go-github/github"
-	"github.com/robfig/cron"
 	log "github.com/sirupsen/logrus"
 )
 
+// config struct
 type config struct {
-	RedisPort        string `env:"NWN_ORDER_REDIS_PORT" envDefault:"6379"`
-	OrderPort        string `env:"NWN_ORDER_PORT" envDefault:"5750"`
-	DiscordBotKey    string `env:"NWN_ORDER_DISCORD_BOT_KEY" envDefault:"tiddies"`
-	HbVerbose        bool   `env:"NWN_ORDER_HB_VERBOSE" envDefault:"false"`
-	HbOneMinute      bool   `env:"NWN_ORDER_HB_ONE_MINUTE" envDefault:"true"`
-	HbFiveMinute     bool   `env:"NWN_ORDER_HB_FIVE_MINUTE" envDefault:"true"`
-	HbThirtyMinute   bool   `env:"NWN_ORDER_HB_THIRTY_MINUTE" envDefault:"true"`
-	HbOneHour        bool   `env:"NWN_ORDER_HB_ONE_HOUR" envDefault:"true"`
-	HbSixHour        bool   `env:"NWN_ORDER_HB_SIX_HOUR" envDefault:"true"`
-	HbTwelveHour     bool   `env:"NWN_ORDER_HB_TWELVE_HOUR" envDefault:"true"`
-	HbTwentyfourHour bool   `env:"NWN_ORDER_HB_TWENTYFOUR_HOUR" envDefault:"true"`
+	// core stiff
+	RedisPort string `env:"NWN_ORDER_REDIS_PORT" envDefault:"6379"`
+	OrderPort string `env:"NWN_ORDER_PORT" envDefault:"5750"`
+
+	// Discord plugin
+	PluginDiscord bool   `env:"NWN_ORDER_PLUGIN_DISCORD_ENABLED" envDefault:"1"`
+	DiscordBotKey string `env:"NWN_ORDER_PLUGIN_DISCORD_BOT_KEY" envDefault:"tiddies"`
+
+	// Heartbeat plugin
+	PluginHearbeat   bool `env:"NWN_ORDER_PLUGIN_HEARTBEAT_ENABLED" envDefault:"1"`
+	HbVerbose        bool `env:"NWN_ORDER_PLUGIN_HEARTBEAT_VERBOSE" envDefault:"false"`
+	HbOneMinute      bool `env:"NWN_ORDER_PLUGIN_HEARTBEAT_ONE_MINUTE" envDefault:"true"`
+	HbFiveMinute     bool `env:"NWN_ORDER_PLUGIN_HEARTBEAT_FIVE_MINUTE" envDefault:"true"`
+	HbThirtyMinute   bool `env:"NWN_ORDER_PLUGIN_HEARTBEAT_THIRTY_MINUTE" envDefault:"true"`
+	HbOneHour        bool `env:"NWN_ORDER_PLUGIN_HEARTBEAT_ONE_HOUR" envDefault:"true"`
+	HbSixHour        bool `env:"NWN_ORDER_PLUGIN_HEARTBEAT_SIX_HOUR" envDefault:"true"`
+	HbTwelveHour     bool `env:"NWN_ORDER_PLUGIN_HEARTBEAT_TWELVE_HOUR" envDefault:"true"`
+	HbTwentyfourHour bool `env:"NWN_ORDER_PLUGIN_HEARTBEAT_TWENTYFOUR_HOUR" envDefault:"true"`
+
+	// Logs plugin
+	PluginLogs bool `env:"NWN_ORDER_PLUGIN_LOG_ENABLED" envDefault:"1"`
 }
 
-var (
-	//RedisClient is a var
-	RedisClient *redis.Client
-)
-
 func initMain() {
+	// grab config
 	cfg := config{}
 	err := env.Parse(&cfg)
-
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 	}
 
+	// start webserver
+	go initWebserver()
+
+	// app started
 	log.WithFields(log.Fields{"Booted": 1}).Info("Order")
 
-	go initDiscord(cfg.DiscordBotKey)
-
+	// connect to redis
 	S := 0
-	conn, err := net.Dial("udp", "redis:6379")
+	conn, err := net.Dial("udp", "redis:"+cfg.RedisPort)
 	for retry := 1; err != nil; retry++ {
 		S := strconv.Itoa(retry)
 		log.WithFields(log.Fields{"Connected": 0, "Attempt": S}).Warn("Order:Redis")
-		if retry > 4 {
-			log.WithFields(log.Fields{"Connected": 0, "Attempt": S}).Fatal("Order:Redis")
+		if retry > 3 {
+			log.WithFields(log.Fields{"Connected": 0, "Attempt": 5}).Fatal("Order:Redis")
 		}
 		time.Sleep(5 * time.Second)
 	}
@@ -62,41 +70,44 @@ func initMain() {
 	// start pubsub
 	go initPubsub()
 
-	go webserver()
-
-	c := cron.New()
-	if cfg.HbOneMinute == true {
-		c.AddFunc("@every 1m", func() { sendPubsub("Heartbeat", "heartbeat", "1") })
-	}
-	log.WithFields(log.Fields{"Heartbeat": "1", "Enabled": cfg.HbOneMinute}).Info("Heartbeat")
-	if cfg.HbFiveMinute == true {
-		c.AddFunc("@every 5m", func() { sendPubsub("Heartbeat", "heartbeat", "5") })
-	}
-	log.WithFields(log.Fields{"Heartbeat": "5", "Enabled": cfg.HbFiveMinute}).Info("Heartbeat")
-	if cfg.HbThirtyMinute == true {
-		c.AddFunc("@every 30m", func() { sendPubsub("Heartbeat", "heartbeat", "30") })
-	}
-	log.WithFields(log.Fields{"Heartbeat": "30", "Enabled": cfg.HbThirtyMinute}).Info("Heartbeat")
-	if cfg.HbOneHour == true {
-		c.AddFunc("@every 1h", func() { sendPubsub("Heartbeat", "heartbeat", "60") })
-	}
-	log.WithFields(log.Fields{"Heartbeat": "60", "Enabled": cfg.HbOneHour}).Info("Heartbeat")
-	if cfg.HbSixHour == true {
-		c.AddFunc("@every 6h", func() { sendPubsub("Heartbeat", "heartbeat", "360") })
-	}
-	log.WithFields(log.Fields{"Heartbeat": "360", "Enabled": cfg.HbSixHour}).Info("Heartbeat")
-	if cfg.HbTwelveHour == true {
-		c.AddFunc("@every 12h", func() { sendPubsub("Heartbeat", "heartbeat", "720") })
-	}
-	log.WithFields(log.Fields{"Heartbeat": "720", "Enabled": cfg.HbTwelveHour}).Info("Heartbeat")
-	if cfg.HbTwentyfourHour == true {
-		c.AddFunc("@every 24h", func() { sendPubsub("Heartbeat", "heartbeat", "1440") })
-	}
-	log.WithFields(log.Fields{"Heartbeat": "1440", "Enabled": cfg.HbTwentyfourHour}).Info("Heartbeat")
-	c.Start()
+	// start plugins
+	go initPlugins()
 
 	for {
 		time.Sleep(time.Second)
+	}
+}
+
+func initPlugins() {
+	// grab config
+	cfg := config{}
+	err := env.Parse(&cfg)
+	if err != nil {
+		fmt.Printf("%+v\n", err)
+	}
+
+	// app started
+	log.WithFields(log.Fields{"Started": 1}).Info("Order:Heartbeat")
+
+	if cfg.PluginDiscord == true {
+		log.WithFields(log.Fields{"Enabled": 1}).Info("Order:Discord")
+		go initDiscord()
+	} else {
+		log.WithFields(log.Fields{"Enabled": 0}).Info("Order:Discord")
+	}
+
+	if cfg.PluginHearbeat == true {
+		log.WithFields(log.Fields{"Enabled": 1}).Info("Order:Heartbeat")
+		go initHeartbeat()
+	} else {
+		log.WithFields(log.Fields{"Enabled": 0}).Info("Order:Heartbeat")
+	}
+
+	if cfg.PluginLogs == true {
+		log.WithFields(log.Fields{"Enabled": 1}).Info("Order:Logs")
+		go initLog()
+	} else {
+		log.WithFields(log.Fields{"Enabled": 0}).Info("Order:Logs")
 	}
 }
 
@@ -178,7 +189,7 @@ func recieveWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func webserver() {
+func initWebserver() {
 	cfg := config{}
 	err := env.Parse(&cfg)
 	if err != nil {

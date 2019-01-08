@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/bwmarrin/discordgo"
+	"github.com/caarlos0/env"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -11,9 +14,16 @@ var (
 	botKey        string
 )
 
-func initDiscord(k string) {
-	log.WithFields(log.Fields{"BotKey": k}).Info("Order:Discord:Status")
-	discord, err := discordgo.New("Bot " + k)
+func initDiscord() {
+	// grab config
+	cfg := config{}
+	err := env.Parse(&cfg)
+	if err != nil {
+		fmt.Printf("%+v\n", err)
+	}
+
+	log.WithFields(log.Fields{"BotKey": cfg.DiscordBotKey, "started": "1"}).Info("Order:Discord")
+	discord, err := discordgo.New("Bot " + cfg.DiscordBotKey)
 	errCheck("error creating discord session", err)
 	user, err := discord.User("@me")
 	errCheck("error retrieving account", err)

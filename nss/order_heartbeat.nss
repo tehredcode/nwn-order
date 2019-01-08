@@ -1,4 +1,3 @@
-
 // -- this is what is triggered via the order heartbeat tickers.
 void OrderHeartbeat(string sTicker){
   //Log("heartbeat: "+sTicker,1);
