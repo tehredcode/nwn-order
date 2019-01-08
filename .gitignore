@@ -8,6 +8,7 @@ installdir
 resman
 config.yml
 *.ncs
+*.log
 
 # Other #
 ###################
