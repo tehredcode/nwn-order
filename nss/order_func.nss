@@ -1,16 +1,43 @@
 #include "nwnx_redis"
 
-int IsCharacterValid() {
+int OrderIsUUIDExists(string uuid);
+int OrderIsUUIDExists(string uuid) {
+  int nIsUnique = NWNX_Redis_HEXISTS(RdsEdgeServer("server")+":uuid", uuid);
+  int nState = NWNX_Redis_GetResultAsInt(nIsUnique);
+  return IntToString(nState);
+}
 
+void OrderAddUUIDtoRedis(string uuid) {
+  NWNX_Redis_HSET(RdsEdgeServer("server")+":uuid", uuid, 1);
+}
+
+string OrderRandomLetterOrNumber();
+string OrderRandomLetterOrNumber() {
+  string sLetter;
+  string sString = "abcdefghijklmnopqrstuvwxyz0123456789";
+  int x = Random(34);
+
+  string sLetter = GetSubString(sString, x, 1);
+  return sLetter;
+}
+
+string OrderGenerateNewUUID() {
+  string sUUID;
+  int nUUIDgen;
+  for (nUUIDgen = 0; nUUIDgen < 31; nUUIDgen++) {
+    string sUUID =  sUUID + OrderRandomLetterOrNumber;
+    nUUIDgen = nUUIDgen+1;
+  }
+  return IntToString(sUUID);
 }
 
 string OrderGetNewUUID() {
-
-  string sRandomName = RandomName(Random(22));
-  string sStringLength = GetStringLength(sRandomName);
-  string sRandomLetter = GetStringLeft(RandomName(21), Random(sStringLength));
-  
-  NWNX_Redis_LINSERT(string key,string where,string pivot,string value);
+  string sUUID = OrderGenerateNewUUID();
+  int nUnique = OrderIsUUIDExists(sUUID);
+  while (nUnique == 1){
+    string sUUID = OrderGetNewUUID();
+  }
+  OrderAddUUIDtoRedis(sUUID);
   return sUUID;
 }
 
@@ -20,22 +47,13 @@ string OrderGetUUIDPlayer(object oPC) {
   // if the user has no uuid set
   if (GetTag(oPC) == "") {  
     object oMod = GetModule();
+    string sUUID = OrderGetNewUUID();
 
-    // -- If in progress, else return ""                                                                                       
-    if (nUuidInProgress != 1) {
-      // get prepared uuid
-      string sUUID = OrderGetNewUUID();
-
-      //set oPC tag to uuid
-      SetTag(oPC, sUUID);
-
-      return sUUID;
-    } else {
-      // if no uuid can be grabbed, return "", which should be filtered from being saved. 
-      return "";
-    }
+    //set oPC tag to uuid
+    SetTag(oPC, sUUID);
+    return sUUID;
   } else {
-      string sUUID = GetTag(oPC);
-      return sUUID;
+    string sUUID = GetTag(oPC);
+    return sUUID;
   }
 }

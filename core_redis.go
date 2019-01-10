@@ -23,19 +23,26 @@ func initPubsub() {
 
 	pubSub := client.Subscribe(
 		"heartbeat",
-		"input",
-		"debug",
 		"github",
+		"Log:Debug",
+		"Log:Info",
+		"Log:Warning",
+		"Log:Fatal",
 	)
-	log.WithFields(log.Fields{"heartbeat": "1", "input": "1", "debug": "1", "github": "1"}).Info("Order:Redis:Pubsub:Subscribe")
+	log.WithFields(log.Fields{"heartbeat": "1", "github": "1", "Log:Debug": "1", "Log:Info": "1", "Log:Warning": "1", "Log:Fatal": "1"}).Info("Order:Redis:Pubsub:Subscribe")
 	for {
 		msg, _ := pubSub.ReceiveMessage()
 		switch msg.Channel {
 		case "heartbeat":
-
-		case "input":
-
-		case "debug":
+			log.WithFields(log.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Payload}).Info("Order:Pubsub")
+		case "Log:Debug":
+			log.WithFields(log.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Payload}).Info("Order:Pubsub")
+		case "Log:Info":
+			log.WithFields(log.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Payload}).Info("Order:Pubsub")
+		case "Log:Warning":
+			log.WithFields(log.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Payload}).Info("Order:Pubsub")
+		case "Log:Fatal":
+			log.WithFields(log.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Payload}).Info("Order:Pubsub")
 		}
 	}
 }

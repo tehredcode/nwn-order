@@ -1,12 +1,16 @@
-int orderLogDebug(string sMessage, string sObject=OBJECT_SELF) {
-    return 1;
+//////
+// This file is for you to hook into important events that fire inside of ORDER. 
+// You can modify this file without fear of breaking in the future.
+//////
+void orderLogDebug(string sMessage) {
+
 }
-int orderLogInfo(string sMessage, string sObject=OBJECT_SELF) {
-    return 1;
+void orderLogInfo(string sMessage) {
+
 }
-int orderLogWarning(string sMessage, string sObject=OBJECT_SELF) {
-    return 1;
+void orderLogWarning(string sMessage) {
+
 }
-int orderLogFatal(string sMessage, string sObject=OBJECT_SELF) {
-    return 1;
+void orderLogFatal(string sMessage) {
+
 }

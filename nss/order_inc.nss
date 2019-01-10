@@ -4,6 +4,7 @@
 #include "order_github"
 #include "order_heartbeat"
 #include "order_return"
+#include "order_external"
 
 string RdsEdgePlayer(string sEdgeType,object oPC);
 string RdsEdgePlayer(string sEdgeType,object oPC) {
@@ -17,7 +18,6 @@ string RdsEdgePlayer(string sEdgeType,object oPC) {
     return "error";
   }
 }
-
 
 string RdsEdgeServer(string sEdgeType);
 string RdsEdgeServer(string sEdgeType) {
