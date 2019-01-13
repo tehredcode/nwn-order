@@ -14,6 +14,15 @@ var (
 	botKey        string
 )
 
+func mapSubexpNames(m, n []string) map[string]string {
+	m, n = m[1:], n[1:]
+	r := make(map[string]string, len(m))
+	for i := range n {
+		r[n[i]] = m[i]
+	}
+	return r
+}
+
 func initDiscord() {
 	// grab config
 	cfg := config{}
@@ -29,7 +38,7 @@ func initDiscord() {
 	errCheck("error retrieving account", err)
 
 	botID = user.ID
-	discord.AddHandler(commandHandler)
+	discord.AddHandler(inHandler)
 	discord.AddHandler(func(discord *discordgo.Session, ready *discordgo.Ready) {
 		err = discord.UpdateStatus(0, "Order")
 		if err != nil {
@@ -55,12 +64,33 @@ func errCheck(msg string, err error) {
 	}
 }
 
-func commandHandler(discord *discordgo.Session, message *discordgo.MessageCreate) {
+func replyHandler(discord *discordgo.Session, message *discordgo.MessageCreate) {
+	// grab config
+	cfg := config{}
+	err := env.Parse(&cfg)
+	if err != nil {
+		fmt.Printf("%+v\n", err)
+	}
+
 	user := message.Author
 	if user.ID == botID || user.Bot {
 		//Do nothing because the bot is talking
 		return
 	}
 
-	log.WithFields(log.Fields{"Message Content": message.Content, "Message": message.Message, "Author": message.Author}).Info("Order:Discord:Message")
+	if message.ChannelID == cfg.DiscordBotRoom {
+		sendPubsub(message.ChannelID, "Discord:Out", "["+message.Author.Username+"] "+message.Content)
+		log.WithFields(log.Fields{"Message Content": message.Content, "Message": message.Message, "Author": message.Author}).Info("Order:Discord:Message")
+		return
+	}
+}
+
+func inHandler(discord *discordgo.Session, m string) {
+	// grab config
+	cfg := config{}
+	err := env.Parse(&cfg)
+	if err != nil {
+		fmt.Printf("%+v\n", err)
+	}
+	discord.ChannelMessageSend(cfg.DiscordBotRoom, m)
 }

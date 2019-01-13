@@ -17,8 +17,9 @@ type config struct {
 	OrderPort string `env:"NWN_ORDER_PORT" envDefault:"5750"`
 
 	// Discord plugin
-	PluginDiscord bool   `env:"NWN_ORDER_PLUGIN_DISCORD_ENABLED" envDefault:"1"`
-	DiscordBotKey string `env:"NWN_ORDER_PLUGIN_DISCORD_BOT_KEY" envDefault:"tiddies"`
+	PluginDiscord  bool   `env:"NWN_ORDER_PLUGIN_DISCORD_ENABLED" envDefault:"1"`
+	DiscordBotKey  string `env:"NWN_ORDER_PLUGIN_DISCORD_BOT_KEY" envDefault:""`
+	DiscordBotRoom string `env:"NWN_ORDER_PLUGIN_DISCOD_BOT_ROOM" envDefault:""`
 
 	// Heartbeat plugin
 	PluginHearbeat   bool `env:"NWN_ORDER_PLUGIN_HEARTBEAT_ENABLED" envDefault:"1"`

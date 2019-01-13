@@ -4,9 +4,9 @@
 #include "order_heartbeat"
 
 int nMessageConvert(string sMessage) {
-  if (sMessage == "input") return 0;
-  if (sMessage == "github") return 1;
-  if (sMessage == "heartbeat") return 2;
+  if (sMessage == "github") return 0;
+  if (sMessage == "heartbeat") return 1;
+  if (sMessage == "discord:in") return 2;
   else return 99;
 }
 
@@ -20,7 +20,6 @@ void main() {
       OrderGithub(data.message);
     case 2: 
       OrderHeartbeat(data.message);
-    default: 
-      //Log(data.Message, 1);
+    default:
   }
 }

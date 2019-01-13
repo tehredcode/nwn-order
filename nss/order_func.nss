@@ -13,9 +13,8 @@ void OrderAddUUIDtoRedis(string uuid) {
 
 string OrderRandomLetterOrNumber();
 string OrderRandomLetterOrNumber() {
-  string sLetter;
   string sString = "abcdefghijklmnopqrstuvwxyz0123456789";
-  int x = Random(34);
+  int x = Random(36);
 
   string sLetter = GetSubString(sString, x, 1);
   return sLetter;
@@ -24,11 +23,10 @@ string OrderRandomLetterOrNumber() {
 string OrderGenerateNewUUID() {
   string sUUID;
   int nUUIDgen;
-  for (nUUIDgen = 0; nUUIDgen < 31; nUUIDgen++) {
-    string sUUID =  sUUID + OrderRandomLetterOrNumber;
-    nUUIDgen = nUUIDgen+1;
+  for (nUUIDgen = 0; nUUIDgen <= 32; nUUIDgen++) {
+    sUUID =  sUUID + OrderRandomLetterOrNumber();
   }
-  return IntToString(sUUID);
+  return sUUID;
 }
 
 string OrderGetNewUUID() {

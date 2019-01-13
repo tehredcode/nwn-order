@@ -1,0 +1,59 @@
+#include "nwnx_chat"
+#include "nwnx_redis"
+
+//void OrderSendChat() {
+//    NWNX_Chat_SendMessage(int channel, string message, object sender = OBJECT_SELF, object target = OBJECT_INVALID);
+//}
+
+int GetIsPlayer(object oTarget) {
+    if (GetIsPC(oTarget) == TRUE) { return TRUE; 
+    } else if (GetIsDM(oTarget) == TRUE)  { return TRUE; 
+    } else return FALSE;
+}
+
+string OrderReturnChatChannel(int nChannel) {
+  if (nChannel == 1) return  "PC-Talk";
+  if (nChannel == 2) return  "PC-Shout";
+  if (nChannel == 3) return  "PC-Whisper";
+  if (nChannel == 4) return  "PC-Tell";
+  if (nChannel == 5) return  "Server-Message";
+  if (nChannel == 6) return  "PC-Party";
+  if (nChannel == 14) return "PC-DM";
+  if (nChannel == 17) return "DM-Talk";
+  if (nChannel == 18) return "DM-Shout";
+  if (nChannel == 19) return "DM-Whisper";
+  if (nChannel == 20) return "DM-Tell";
+  if (nChannel == 22) return "DM-Party";
+  if (nChannel == 30) return "DM-DM";
+  return "err";
+}
+
+void main() {   
+    string sChat;
+
+    // channel
+    int nChannel = NWNX_Chat_GetChannel();
+    string sChannel = OrderReturnChatChannel(nChannel);
+
+    // break if it's the server talking
+    if (nChannel == 5) return;
+
+    // confirm the object calling the chat is a player
+    if (GetIsPlayer(OBJECT_SELF) == FALSE) return;
+
+    // sender
+    object oNameSender = NWNX_Chat_GetSender();
+    string sNameSender = GetName(oNameSender);
+    if (NWNX_Chat_GetSender() == OBJECT_INVALID) return;
+
+    // receiver
+    object oNameReceiver = NWNX_Chat_GetTarget();
+    string sNameReceiver = GetName(oNameReceiver);
+
+    // get the message sent
+    string sMessage = NWNX_Chat_GetMessage();
+
+    // make a string order can parse and log
+    sChat = sNameSender+":"+sNameReceiver+":"+sChannel+":"+sMessage;
+    NWNX_Redis_PUBLISH("discord:out",sChat);
+}
