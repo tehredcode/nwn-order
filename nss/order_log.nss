@@ -22,8 +22,8 @@ void RedisLog(string sMessage, int nLogLevel, int nForever=FALSE) {
   if (nListLength > 3000) CleanLog();
 
   switch (nLogLevel) {   
-  case 0: NWNX_Redis_RPUSH(RdsEdgeServer("server")+"Logs",sMessage);
-  case 1: NWNX_Redis_RPUSH(RdsEdgeServer("server")+"CriticalLogs",sMessage);
+  case 0: NWNX_Redis_RPUSH(RdsEdgeServer("server")+"Logs",sMessage);         break;
+  case 1: NWNX_Redis_RPUSH(RdsEdgeServer("server")+"CriticalLogs",sMessage); break;
   default:
   }
 }
@@ -40,21 +40,17 @@ void RedisLog(string sMessage, int nLogLevel, int nForever=FALSE) {
 // 2:public
 ///////////////////
 void orderLog(string sMessage, int nLogLevel, int nWebhook=1, int nWebhookLevel=0, int nSaveError=1, int nPermSaveError=0) {
-  switch (nLogLevel) {
-  case 0:  
-    OrderLogDebug(sMessage);
-  case 1:  
-    OrderLogInfo(sMessage);
-  case 2:  
-    OrderLogWarning(sMessage);
-  case 3:  
-    OrderLogFatal(sMessage);
-  default: 
-    OrderLogWarning("Log level not recognized");
 
   if (nWebhook) OrderSendbWebhook(nWebhookLevel, sMessage, "Order:Log: " + IntToString(nWebhookLevel));
   if (nSaveError) RedisLog(sMessage,nLogLevel,nPermSaveError); 
 
   NWNX_Redis_PUBLISH("Log:"+IntToString(nLogLevel),sMessage);
+
+  switch (nLogLevel) {
+  case 0:  OrderLogDebug(sMessage);                     break;
+  case 1:  OrderLogInfo(sMessage);                      break;
+  case 2:  OrderLogWarning(sMessage);                   break;
+  case 3:  OrderLogFatal(sMessage);                     break;
+  default: OrderLogWarning("Log level not recognized"); break;
   }
 }

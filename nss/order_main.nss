@@ -16,10 +16,14 @@ void main() {
   switch(nMessage) {
     case 0: 
       OrderReturn(data.message);
+      break;
     case 1: 
       OrderGithub(data.message);
+      break;
     case 2: 
       OrderHeartbeat(data.message);
+      break;
     default:
+      break;
   }
 }

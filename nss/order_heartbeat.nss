@@ -4,18 +4,25 @@ void OrderHeartbeat(string sTicker){
   int nTicker = StringToInt(sTicker);
   switch (nTicker) {   
     case 0:
-      // do the thing
+      OrderHeartbeat1();
+      break;
     case 5:
-      // do the thing
+      OrderHeartbeat5();
+      break;
     case 60:
-      // do the thing
+      OrderHeartbeat60();
+      break;
     case 360:
-      // do the thing
+      OrderHeartbeat360();
+      break;
     case 720:
-      // do the thing
+      OrderHeartbeat720();
+      break;
     case 1440:
-      // do the thing
+      OrderHeartbeat1440();
+      break;
     default:
       //Log("Error, ticker not recognized.",1);
+      break;
     }
 }

@@ -19,7 +19,7 @@ void OrderLogFatal(string sMessage) {
 
 
 // Heartbeat events
-void OrderHeartbeat0() {
+void OrderHeartbeat1() {
 
 }
 void OrderHeartbeat5() {

@@ -12,20 +12,22 @@ int GetIsPlayer(object oTarget) {
 }
 
 string OrderReturnChatChannel(int nChannel) {
-  if (nChannel == 1) return  "PC-Talk";
-  if (nChannel == 2) return  "PC-Shout";
-  if (nChannel == 3) return  "PC-Whisper";
-  if (nChannel == 4) return  "PC-Tell";
-  if (nChannel == 5) return  "Server-Message";
-  if (nChannel == 6) return  "PC-Party";
-  if (nChannel == 14) return "PC-DM";
-  if (nChannel == 17) return "DM-Talk";
-  if (nChannel == 18) return "DM-Shout";
-  if (nChannel == 19) return "DM-Whisper";
-  if (nChannel == 20) return "DM-Tell";
-  if (nChannel == 22) return "DM-Party";
-  if (nChannel == 30) return "DM-DM";
-  return "err";
+  switch() {
+    case 1:  return "PC-Talk"; 
+    case 2:  return "PC-Shout";     
+    case 3:  return "PC-Whisper"; 
+    case 4:  return "PC-Tell"; 
+    case 5:  return "Server-Message"; 
+    case 6:  return "PC-Party"; 
+    case 14: return "PC-DM";
+    case 17: return "DM-Talk";
+    case 18: return "DM-Shout";
+    case 19: return "DM-Whisper";
+    case 20: return "DM-Tell";
+    case 22: return "DM-Party";
+    case 30: return "DM-DM";
+    default: return "Err"
+  }
 }
 
 void main() {   
