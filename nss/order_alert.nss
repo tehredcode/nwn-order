@@ -1,25 +1,26 @@
 #include "nwnx_webhook"
-#include "order_log"
 
 // Send webhook
-void OrderSendbWebhook(int nPermission, string sMessage, string sSendername) {
+void OrderSendWebhook(int nPermission, string sMessage, string sSendername) {
   object oMod = GetModule();
-  string sWebhookUrlPublic  = GetLocalString(oMod, "WEBHOOK_PUBLIC");
-  string sWebhookUrlPrivate = GetLocalString(oMod, "WEBHOOK_PRIVATE");
-  string sWebhookUrlDebug   = GetLocalString(oMod, "WEBHOOK_DEBUG");
-
   switch (nPermission) {   
-  case 0:
+  case 0: {
+    string sWebhookUrlDebug   = GetLocalString(oMod, "WEBHOOK_DEBUG");
     NWNX_WebHook_SendWebHookHTTPS("discordapp.com/api/webhooks/" + sWebhookUrlDebug + "/slack", sMessage, sSendername);
     break;
-  case 1:
+  }
+  case 1: {
+    string sWebhookUrlPrivate = GetLocalString(oMod, "WEBHOOK_PRIVATE");
     NWNX_WebHook_SendWebHookHTTPS("discordapp.com/api/webhooks/" + sWebhookUrlPrivate + "/slack", sMessage, sSendername);
     break;
-  case 2:
+  }
+  case 2: {
+    string sWebhookUrlPublic  = GetLocalString(oMod, "WEBHOOK_PUBLIC");
     NWNX_WebHook_SendWebHookHTTPS("discordapp.com/api/webhooks/" + sWebhookUrlPublic + "/slack", sMessage, sSendername);
     break;
-  default:
-    orderLog(sMessage, 2);
+    }
+  default: {
     break;
+    }
   }
 }

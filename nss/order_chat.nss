@@ -12,7 +12,7 @@ int GetIsPlayer(object oTarget) {
 }
 
 string OrderReturnChatChannel(int nChannel) {
-  switch() {
+  switch(nChannel) {
     case 1:  return "PC-Talk"; 
     case 2:  return "PC-Shout";     
     case 3:  return "PC-Whisper"; 
@@ -26,8 +26,8 @@ string OrderReturnChatChannel(int nChannel) {
     case 20: return "DM-Tell";
     case 22: return "DM-Party";
     case 30: return "DM-DM";
-    default: return "Err"
   }
+  return "Err";
 }
 
 void main() {   
