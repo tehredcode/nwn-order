@@ -1,23 +1,22 @@
 #include "nwnx_redis"
 
-string RdsEdgeServer(string sEdgeType);
-string RdsEdgeServer(string sEdgeType) {
-  string Nwserver = GetModuleName();
-  if (sEdgeType == "server") {
-    string sServerEdge = Nwserver+":server:";
-    return sServerEdge; 
-  }
-  else if (sEdgeType == "item") {
-    string sItemsEdge = Nwserver+":item:";
-    return sItemsEdge;
-  } else {
-    return "error";
+string OrderObjectUUID(int nEdgeType);
+string OrderObjectUUID(int nEdgeType) {
+  string sNwserver = GetModuleName();
+  switch (nEdgeType) {
+    case 1: { return sNwserver+":server"; }        
+    case 2: { return sNwserver+":item"; }
+    case 3: { return sNwserver+":creature"; }
+    case 4: { return sNwserver+":door"; }
+    case 5: { return sNwserver+":placeable"; } 
+    case 6: { return sNwserver+":quests"; }     
+    default:{ return "err"; }
   }
 }
 
 int OrderIsUUIDExists(string uuid);
 int OrderIsUUIDExists(string uuid) {
-  int nIsUnique = NWNX_Redis_HEXISTS(RdsEdgeServer("server")+":uuid", uuid);
+  int nIsUnique = NWNX_Redis_HEXISTS(RdsEdgeServer(1)+":uuid", uuid);
   int nState = NWNX_Redis_GetResultAsInt(nIsUnique);
   return nState;
 }
@@ -30,7 +29,6 @@ string OrderRandomLetterOrNumber();
 string OrderRandomLetterOrNumber() {
   string sString = "abcdefghijklmnopqrstuvwxyz0123456789";
   int x = Random(34);
-
   string sLetter = GetSubString(sString, x, 1);
   return sLetter;
 }
@@ -73,15 +71,9 @@ string OrderGetUUIDPlayer(object oPC) {
   }
 }
 
-string RdsEdgePlayer(string sEdgeType,object oPC);
-string RdsEdgePlayer(string sEdgeType,object oPC) {
+string OrderPlayerUUID(object oPC);
+string OrderPlayerUUID(object oPC) {
   string Nwserver = GetModuleName();
-  string CDKey    = GetPCPublicCDKey(oPC, FALSE);
   string UUID     = OrderGetUUIDPlayer(oPC);
-  if (sEdgeType == "player") {
-    string sEdge = Nwserver+":player:"+UUID;
-    return sEdge;
-  } else {
-    return "error";
-  }
+  return sNwserver+":player:"+UUID;
 }
