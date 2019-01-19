@@ -25,24 +25,27 @@ int QuestOnePhaseOne(object oPC) {
   OrderQuestObjectAddValue(oPC,sQuest,sQuestItem2,"status","1");
   OrderQuestObjectAddValue(oPC,sQuest,sQuestItem3,"ObjectiveType","Kill");
   OrderQuestObjectAddValue(oPC,sQuest,sQuestItem3,"status","1");
+  return 1;
 }
 
 int QuestOnePhaseTwo(object oPC) {
   OrderQuestAddValue(oPC, sQuest, "ReadableStatus", "How will I smoke all this herb");
   OrderQuestObjectAddValue(oPC,sQuest,sQuestItem1,"status","2");
+  return 1;
 }
 
 int QuestOnePhaseThree(object oPC) {
   OrderQuestAddValue(oPC, sQuest, "ReadableStatus", "Who stole all my herb");
   OrderQuestObjectAddValue(oPC,sQuest,sQuestItem2,"status","2");
+  return 1;
 }
 
 int QuestOnePhaseFour(object oPC) {
   OrderQuestAddValue(oPC, sQuest, "ReadableStatus", "Lit bro");
   OrderQuestObjectAddValue(oPC,sQuest,sQuestItem3,"status","2");
   GiveReward();
+  return 1;
 }
-
 
 int ExampleQuest1Check(object oPC) {
   int nObjectCheck1 = OrderQuestObjectGetValueInt(oPC,sQuest, sQuestItem1, Status);

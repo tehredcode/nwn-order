@@ -1,29 +1,70 @@
 #include "order_quest"
+#include "order_players"
 
-string ExamineDM(object oObject, int nType) {
+// should return a list of quests on oPC, intended for dm use
+string OrderDescriptionQuestList(object oPC) {
   string sOutput;
-  sOutput += "DM Only Information:\n";
-  sOutput += "UUID: "+GetTag(oObject);
-  sOutput += "ResRef: "+GetResRef(oObject);
-           
-  string sHash = sObjectUUID(nType,oObject);
-  int zCursor = NWNX_Redis_HKEYS(sHash);
-  int i; for (i = 0; i < NWNX_Redis_GetArrayLength(zCursor); i++) { 
+  int zCursor = NWNX_Redis_HKEYS(OrderPlayerUUID(oPC)+":quest");
+  int i;
+  for (i = 0; i < NWNX_Redis_GetArrayLength(zCursor); i++) {
     int zEntry  = NWNX_Redis_GetArrayElement(zCursor, i);
-    string sField = NWNX_Redis_GetResultAsString(zEntry);
-
-    int zValue = NWNX_Redis_HMGET(oObject,sField);
-    string sValue = NWNX_Redis_GetResultAsString(zEntry);
-
-    sOutput += GetName(oObject)":"+sField +": "+sValue+"\n";
+    string sField = NWNX_Redis_GetResultAsString(zEntry);{
+    int zValue = NWNX_Redis_HMGet(RdsEdgePlayer("player",oPC)+":quest"+sQuest+":objects"+sResRef,"ReadableStatus");
+    string sValue = NWNX_Redis_GetResultAsString(zValue);
+    int zName = NWNX_Redis_HMGet(RdsEdgePlayer("player",oPC)+":quest"+sQuest+":objects"+sResRef,"Name");
+    string sName = NWNX_Redis_GetResultAsString(zName);
+    // example output "  The Weed Wizard's Coven: You need more herb"
+    sOutput += "  " + sName + ": "+ sValue;
+    }
   }
   sOutput += "\n";
   sOutput += "\n";
   return sOutput;
 }
 
+ExamineDMObjectCreature() {
+  string sOutput;
+  sOutput += "DM information:\n";
+  sOutput += "UUID: "+GetTag(oObject)+"\n";
+  sOutput += "ResRef: "+GetResRef(oObject)+"\n";
+  sOutput += "Current Quests:\n";
+  sOutput += OrderDescriptionQuestList();
+
+  return sOutput;
+}
+
+ExamineDMObjectItem() {}
+
+ExamineDMObjectDoor() {}
+
+ExamineDMObjectPlaceable() {}
+
+string ExamineDMObject(object oObject, int nType) {
+  string sOutput;
+
+  switch(nType) {
+    // Creature
+    case 1:
+    OrderExamineCreatureObject(oExaminee,oExaminer,nEnemy,nDM);
+    // Item
+    case 2:
+    OrderExamineItem(oExaminee,oExaminer,nDM);
+    // Door
+    case 8:
+    OrderExamineDoor(oExaminee,oExaminer,nDM);
+    // Placeable
+    case 64:
+    OrderExaminePlaceable(oExaminee,oExaminer,nDM);
+
+    // not special
+    default:
+        return;
+  }
+  return sOutput;
+}
+
 // should return a list of quests on the object 
-string ExamineQuest(string sResref, object oPC) {
+string ExamineQuestObject(string sResref, object oPC) {
   string sOutput;
   sOutput += "Quests:\n";
 
@@ -34,13 +75,7 @@ string ExamineQuest(string sResref, object oPC) {
   for (i = 0; i < NWNX_Redis_GetArrayLength(zCursor); i++) {
     int zEntry  = NWNX_Redis_GetArrayElement(zCursor, i);
     string sField = NWNX_Redis_GetResultAsString(zEntry);
-    
-    int err = NWNX_Redis_EXISTS(RdsEdgePlayer("player",oPC)+":quest"+sQuest+":objects"+sResRef,"ReadableStatus");
-    if (err != 0) {
-      int zValue = NWNX_Redis_HMGet(RdsEdgePlayer("player",oPC)+":quest"+sQuest+":objects"+sResRef,"ReadableStatus");
-      string sValue = NWNX_Redis_GetResultAsString(zValue);
-      int zName = NWNX_Redis_HMGet(RdsEdgePlayer("player",oPC)+":quest"+sQuest+":objects"+sResRef,"Name");
-      sOutput += "  " + sName + ": "+ sValue;
+    sOutput += 
     }
   }
   sOutput += "\n";
@@ -48,81 +83,128 @@ string ExamineQuest(string sResref, object oPC) {
   return sOutput;
 }
 
-// examine creature yo
-void OrderExamineCreature(object oCreature,object oPC){
-    string sDescribe = GetDescription(oCreature, TRUE, TRUE);
-    float fCR = GetChallengeRating(oCreature);
-
-    string sOutput = GetName(oCreature);
-        // debug information
-        if (IsoPCDM(oPC) == 1) {
-            sOutput += ExamineDM(); 
-        }
-
-        sOutput += ExamineQuest(GetResRef(oCreature));
-
-        // creature information
-        sOutput += "Class: "     + GetStringByStrRef(StringToInt(Get2DAString("Classes","Label",GetClassByPosition(1, oCreature)))); + ": " + IntToString(GetLevelByPosition(1, oCreature))+"\n";
-        sOutput += "Class: "     + GetStringByStrRef(StringToInt(Get2DAString("Classes","Label",GetClassByPosition(2, oCreature))); + ": " + IntToString(GetLevelByPosition(2, oCreature))+"\n";
-        sOutput += "Class: "     + GetStringByStrRef(StringToInt(Get2DAString("Classes","Label",GetClassByPosition(3, oCreature)))); + ": " + IntToString(GetLevelByPosition(3, oCreature))+"\n";
-        sOutput += "STR: "       + IntToString(GetAbilityScore(oCreature, ABILITY_STRENGTH))+"\n";
-        sOutput += "DEX: "       + IntToString(GetAbilityScore(oCreature, ABILITY_DEXTERITY))+"\n";
-        sOutput += "CON: "       + IntToString(GetAbilityScore(oCreature, ABILITY_CONSTITUTION))+"\n";
-        sOutput += "INT: "       + IntToString(GetAbilityScore(oCreature, ABILITY_INTELLIGENCE))+"\n";
-        sOutput += "WIS: "       + IntToString(GetAbilityScore(oCreature, ABILITY_WISDOM))+"\n";
-        sOutput += "CHA: "       + IntToString(GetAbilityScore(oCreature, ABILITY_CHARISMA))+"\n";
-        sOutput += "AC: "        + IntToString(GetAC(oCreature))+"\n";
-        sOutput += "HP: "        + IntToString(GetCurrentHitPoints(oCreature)) + "/" + IntToString(GetMaxHitPoints(oCreature))+"\n";
-        sOutput += "BAB: "       + IntToString(GetBaseAttackBonus(oCreature))+"\n";
-        sOutput += "Fortitude: " + IntToString(GetFortitudeSavingThrow(oCreature))+"\n";
-        sOutput += "Reflex: "    + IntToString(GetReflexSavingThrow(oCreature))+"\n";
-        sOutput += "Will: "      + IntToString(GetWillSavingThrow(oCreature))+"\n";
-        sOutput += "SR: "        + IntToString(GetSpellResistance(oCreature))+"\n";
-        sOutput += "\n";
-        sOutput += "\n";
-        sOutput += sDescribe;
-    SetDescription(oCreature, sOutput, TRUE);
-}
-
-// examine item
+//////////////////////////////
+// examine item object
+//////////////////////////////
 void OrderExamineItem(object oItem, object oPC) {
-
+  string sDescribe = GetDescription(oExaminee, TRUE, TRUE);
+  int nEnemy = GetIsEnemy(oExaminee,oExaminer);
+  switch(nEnemy) {
+    case 0: sOutput += ExaminePlayer();
+    case 1: sOutput += ExamineNPC(nEnemy);
+    }
+  }
+  SetDescription(oExaminee, sOutput, TRUE);
 }
 
-// examine door
-void OrderExamineDoor(object oDoor,object oPC) {
-
+//////////////////////////////
+// examine door object
+//////////////////////////////
+void OrderExamineDoor(object oDoor,object oPC, int nDM) {
+  string sOutput;
+  return sOutput;
 }
 
-// examine placeable
+//////////////////////////////
+// examine placeable object
+//////////////////////////////
 void OrderExaminePlaceable(object oPlaceable,object oPC) {
-
+  string sOutput;
+  return sOutput;
 }
 
+
+//////////////////////////////
+// examine creature object
+//////////////////////////////
+string ExamineNPC(object oCreature, int nEnemy) {
+  switch(nEnemy) {
+    case 0: {
+      // npc friendly
+
+    }
+    case 1: {
+      // npc hostile
+      float fCR = GetChallengeRating(oCreature);
+      string sOutput = GetName(oCreature);
+      sOutput += ExamineQuest(GetResRef(oCreature));
+      sOutput += "Class: "     + GetStringByStrRef(StringToInt(Get2DAString("Classes","Label",GetClassByPosition(1, oCreature)))); + ": " + IntToString(GetLevelByPosition(1, oCreature))+"\n";
+      sOutput += "Class: "     + GetStringByStrRef(StringToInt(Get2DAString("Classes","Label",GetClassByPosition(2, oCreature))); + ": " + IntToString(GetLevelByPosition(2, oCreature))+"\n";
+      sOutput += "Class: "     + GetStringByStrRef(StringToInt(Get2DAString("Classes","Label",GetClassByPosition(3, oCreature)))); + ": " + IntToString(GetLevelByPosition(3, oCreature))+"\n";
+      sOutput += "STR: "       + IntToString(GetAbilityScore(oCreature, ABILITY_STRENGTH))+"\n";
+      sOutput += "DEX: "       + IntToString(GetAbilityScore(oCreature, ABILITY_DEXTERITY))+"\n";
+      sOutput += "CON: "       + IntToString(GetAbilityScore(oCreature, ABILITY_CONSTITUTION))+"\n";
+      sOutput += "INT: "       + IntToString(GetAbilityScore(oCreature, ABILITY_INTELLIGENCE))+"\n";
+      sOutput += "WIS: "       + IntToString(GetAbilityScore(oCreature, ABILITY_WISDOM))+"\n";
+      sOutput += "CHA: "       + IntToString(GetAbilityScore(oCreature, ABILITY_CHARISMA))+"\n";
+      sOutput += "AC: "        + IntToString(GetAC(oCreature))+"\n";
+      sOutput += "HP: "        + IntToString(GetCurrentHitPoints(oCreature)) + "/" + IntToString(GetMaxHitPoints(oCreature))+"\n";
+      sOutput += "BAB: "       + IntToString(GetBaseAttackBonus(oCreature))+"\n";
+      sOutput += "Fortitude: " + IntToString(GetFortitudeSavingThrow(oCreature))+"\n";
+      sOutput += "Reflex: "    + IntToString(GetReflexSavingThrow(oCreature))+"\n";
+      sOutput += "Will: "      + IntToString(GetWillSavingThrow(oCreature))+"\n";
+      sOutput += "SR: "        + IntToString(GetSpellResistance(oCreature))+"\n";
+      sOutput += "\n";
+      sOutput += "\n";
+      sOutput += sDescribe;
+      return sOutput;
+    }
+  }
+}
+
+string ExaminePlayer(object oCreature, int nEnemy) {
+  string sOutput;
+
+  // bounty
+  if OrderBountyHasBounty(oPC){
+    string sBountyAmmount = IntToString(OrderBountyGetValue(object oPC));
+    sOutput += "Bounty: " + sBountyAmmount + "g"
+  }
+
+  return sOutput;
+}
+
+// examine creature yo
+void OrderExamineCreatureObject(object oExaminee,object oExaminer, int nEnemy, int nDM){
+  string sDescribe = GetDescription(oExaminee, TRUE, TRUE);
+  switch(nEnemy) {
+    case 0: sOutput += ExaminePlayer();
+    case 1: sOutput += ExamineNPC(nEnemy);
+  }
+  if (nDM) sOutput += ExamineDMObject();
+  SetDescription(oExaminee, sOutput, TRUE);
+}
+
+//////////////////////////////
 //  main event when a player opens the description on an object.
+//////////////////////////////
 void main()
 {
   // examiner
-  object oPC = OBJECT_SELF;
+  object oExaminer = OBJECT_SELF;
   
   // examinee
   object oExaminee = NWNX_Object_StringToObject(NWNX_Events_GetEventData("EXAMINEE_OBJECT_ID"));
+
+  // is the object our friend?
+  int nDM = GetIsDM(oExaminer);
 
   // Determine item type
   int nType = GetObjectType(oExaminee);
   switch(nType) {
     // Creature
     case 1:
-    OrderExamineCreature(GetResRef(oExaminee),oPC);
+    int nEnemy = GetIsEnemy(oExaminee,oExaminer);
+    OrderExamineCreatureObject(oExaminee,oExaminer,nEnemy,nDM);
     // Item
     case 2:
-    OrderExamineItem(oExaminee,oPC);
+    OrderExamineItem(oExaminee,oExaminer,nDM);
     // Door
     case 8:
-    OrderExamineDoor(oExaminee,oPC);
+    OrderExamineDoor(oExaminee,oExaminer,nDM);
     // Placeable
     case 64:
-    OrderExaminePlaceable(oExaminee,oPC);
+    OrderExaminePlaceable(oExaminee,oExaminer,nDM);
 
     // not special
     default:

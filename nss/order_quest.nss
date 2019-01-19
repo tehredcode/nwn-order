@@ -63,3 +63,4 @@ int OrderQuestGetValueInt(object oPC, string sQuest, string sEntry) {
 void DeleteQuest(object oPC, string sQuestName) {
   NWNX_Redis_HDEL(RdsEdgePlayer("player",oPC)+":quest", sQuestName);
 }
+
