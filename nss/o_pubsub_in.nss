@@ -4,7 +4,7 @@
 #include "order_heartbeat"
 
 int nMessageConvert(string sMessage) {
-  if (sMessage == "github") return 0;
+  if (sMessage == "webhook:github") return 0;
   if (sMessage == "heartbeat") return 1;
   if (sMessage == "discord:in") return 2;
   else return 99;
@@ -15,13 +15,14 @@ void main() {
   int nMessage = nMessageConvert(data.channel);
   switch(nMessage) {
     case 0: 
-      OrderReturn(data.message);
-      break;
-    case 1: 
       OrderGithub(data.message);
       break;
+    case 1: 
+      int nTicker = StringToInt(data.message);
+      OrderHeartbeat(nTicker);
+      break;
     case 2: 
-      OrderHeartbeat(data.message);
+      OrderIncomingDiscord(data.message);
       break;
     default:
       break;

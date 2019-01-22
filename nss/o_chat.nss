@@ -1,10 +1,6 @@
 #include "nwnx_chat"
 #include "nwnx_redis"
 
-//void OrderSendChat() {
-//    NWNX_Chat_SendMessage(int channel, string message, object sender = OBJECT_SELF, object target = OBJECT_INVALID);
-//}
-
 int GetIsPlayer(object oTarget) {
     if (GetIsPC(oTarget) == TRUE) { return TRUE; 
     } else if (GetIsDM(oTarget) == TRUE)  { return TRUE; 

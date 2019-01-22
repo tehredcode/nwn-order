@@ -1,15 +1,19 @@
 #include "nwnx_redis"
 #include "order_inc"
 
-void OrderQuestObjectAddValue(object oPC, string sQuest, string sResRef, string sEntry, string sValue);
-void OrderQuestObjectRemoveValue(object oPC, string sQuest, string sResRef, string sEntry, string sValue);
+// quest object functions
+void   OrderQuestObjectAddValue(object oPC, string sQuest, string sResRef, string sEntry, string sValue);
+void   OrderQuestObjectRemoveValue(object oPC, string sQuest, string sResRef, string sEntry, string sValue);
 string OrderQuestObjectGetValueString(object oPC, string sQuest, string sResRef, string sEntry);
-int OrderQuestObjectGetValueInt(object oPC, string sQuest, string sResRef, string sEntry);
-void OrderQuestAddValue(object oPC, string sQuest, string sEntry, string sValue);
-void OrderQuestRemoveValue(object oPC, string sQuest, string sEntry, string sValue);
+int    OrderQuestObjectGetValueInt(object oPC, string sQuest, string sResRef, string sEntry);
+// main quest functions
+void   OrderQuestAddValue(object oPC, string sQuest, string sEntry, string sValue);
+void   OrderQuestRemoveValue(object oPC, string sQuest, string sEntry, string sValue);
 string OrderQuestGetValueString(object oPC, string sQuest, string sEntry);
-int OrderQuestGetValueInt(object oPC, string sQuest, string sEntry);
-void DeleteQuest(object oPC, string sQuestName);
+int    OrderQuestGetValueInt(object oPC, string sQuest, string sEntry);
+void   OrderQuestDeletet(object oPC, string sQuestName);
+
+
 
 // Add a quest object value
 void OrderQuestObjectAddValue(object oPC, string sQuest, string sResRef, string sEntry, string sValue) {
@@ -60,7 +64,7 @@ int OrderQuestGetValueInt(object oPC, string sQuest, string sEntry) {
 }
 
 // Remove a quest, Yes this deletes everything.
-void DeleteQuest(object oPC, string sQuestName) {
+void OrderQuestDeletet(object oPC, string sQuestName) {
   NWNX_Redis_HDEL(RdsEdgePlayer("player",oPC)+":quest", sQuestName);
 }
 

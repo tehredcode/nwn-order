@@ -1,9 +1,8 @@
 #include "order_external"
 
 // -- this is what is triggered via the order heartbeat tickers.
-void OrderHeartbeat(string sTicker){
+void OrderHeartbeat(int nTicker){
   //Log("heartbeat: "+sTicker,1);
-  int nTicker = StringToInt(sTicker);
   switch (nTicker) {   
     case 0:
       OrderHeartbeat1();

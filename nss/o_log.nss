@@ -2,6 +2,12 @@
 #include "order_external"
 #include "order_alert"
 
+// channels we send log messages to
+const string sLogDebug     = "Log:Debug";
+const string sLogInfo      = "Log:Warning";
+const string sDebugWarning = "Log:Fatal";
+const string sDebugFatal   = "Log:Fatal";
+
 ///////////////////
 //  Will check length of the list and determine how many old entries to purge
 ///////////////////
@@ -26,6 +32,30 @@ void RedisLog(string sMessage, int nLogLevel, int nForever=FALSE) {
   case 1: NWNX_Redis_RPUSH(RdsEdgeServer("server")+"CriticalLogs",sMessage); break;
   default:
   }
+}
+
+//
+void OrderLogDebug(string sMessage){
+  OrderExternalLogDebug();
+  NWNX_Redis_PUBLISH(sLogDebug, sMessage);
+}
+
+//
+void OrderLogInfo(string sMessage){
+  OrderExternalLogInfo();
+  NWNX_Redis_PUBLISH(sLogInfo, sMessage);
+}
+
+//
+void OrderLogWarning(string sMessage){
+  OrderExternalLogWarning();
+  NWNX_Redis_PUBLISH(sDebugWarning, sMessage);
+}
+
+// WARNING, THIS WILL SHUT DOWN ORDER
+void OrderLogFatal(string sMessage){
+  OrderExternalLogFatal();
+  NWNX_Redis_PUBLISH(sDebugFatal, sMessage);
 }
 
 ///////////////////
