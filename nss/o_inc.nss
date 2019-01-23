@@ -1,12 +1,12 @@
 const string sServerName = GetModuleName();
 
-string OrderObjectEdge(int nEdgeType);
-string OrderObjectEdge(int nEdgeType) {
-  switch (nEdgeType) {
-    case 1: { return sNwserver+":server:"; }        
-    case 2: { return sNwserver+":door:"; }
-    case 3: { return sNwserver+":placeable:"; }  
-    case 4: { return sNwserver+":chat:"}   
+string OrderObjectEdge(int nType);
+string OrderObjectEdge(int nype) {
+  switch (nType) {
+    case 1: { return sNwserver+":server"; }        
+    case 2: { return sNwserver+":door"; }
+    case 3: { return sNwserver+":placeable"; }  
+    case 4: { return sNwserver+":chat"}   
     default:{ return "err"; }
   }
 }
@@ -27,7 +27,7 @@ string OrderUniqueObjectEdge(object oObject){
         return sUUID;
       } else {
         string sUUID = GetTag(oObject);
-        return sServerName+":Player:"+sUUID+":";
+        return sServerName+":Player:"+sUUID;
       }
 
     // Item
@@ -35,12 +35,12 @@ string OrderUniqueObjectEdge(object oObject){
       // if the item has no uuid set
       if (GetTagIsUUID(oObject) == 1) {  
         string sUUID = OrderGetNewUUID();
-        OrderItemAddValue(oObject, "OldTag", GetTag(oObject)));
+        OrderItemAddValue(oObject, "oldTag", GetTag(oObject));
         SetTag(oObject, sUUID);
-        return sServerName+":Item"+sUUID+":";
+        return sServerName+":Item"+sUUID;
       } else {
         string sUUID = GetTag(oObject);
-        return sServerName+":Item"+sUUID+":";
+        return sServerName+":Item"+sUUID;
       }
     default:
     // log("a UUID cannot be added to: " + GetName(oObject) + ":" + GetResRef(oObject));

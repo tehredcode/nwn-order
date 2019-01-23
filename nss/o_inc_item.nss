@@ -2,16 +2,16 @@
 #include "order_inc"
 
 // item system functions
-void OrderPlayerSystemSetValue(object oPC, string sSystem, string sKey, string sValue);
-void OrderPlayerSystemRemoveValue(object oPC, string sSystem, string sKey);
+void   OrderPlayerSystemSetValue(object oPC, string sSystem, string sKey, string sValue);
+void   OrderPlayerSystemRemoveValue(object oPC, string sSystem, string sKey);
 string OrderPlayersystemObjectGetValueString(object oPC, string sSystem, string sKey);
-int OrderPlayerSystemGetValueInt(object oPC, string sSystem, string sKey);
+int    OrderPlayerSystemGetValueInt(object oPC, string sSystem, string sKey);
 // main Item functions
-void OrderItemAddValue(object oItem, string sKey, string sValue);
-void OrderItemRemoveValue(object oItem, string sKey);
+void   OrderItemSetValue(object oItem, string sKey, string sValue);
+void   OrderItemRemoveValue(object oItem, string sKey);
 string OrderItemGetValueString(object oItem, string sKey);
-int OrderItemGetValueInt(object oItem, string sKey);
-void DeleteItem(object oItem);
+int    OrderItemGetValueInt(object oItem, string sKey);
+void   OrderItemDelete(object oItem);
 
 // Add an Item system value
 void OrderPlayerSystemSetValue(object oPC, string sSystem, string sKey, string sValue) {
@@ -38,7 +38,7 @@ int OrderPlayerSystemGetValueInt(object oPC, string sSystem, string sKey) {
 }
 
 // Add a value to the core quest hash
-void OrderItemAddValue(object oItem, string sKey, string sValue) {
+void OrderItemSetValue(object oItem, string sKey, string sValue) {
   NWNX_Redis_HMSET(OrderUniqueObjectEdge(oItem),sKey,sValue);
 }
 
@@ -62,6 +62,6 @@ int OrderItemGetValueInt(object oItem, string sKey) {
 }
 
 // Remove an item
-void DeleteItem(object oItem) {
+void OrderItemDelete(object oItem) {
   NWNX_Redis_HDEL(OrderUniqueObjectEdge(oItem));
 }

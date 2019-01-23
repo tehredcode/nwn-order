@@ -1,16 +1,15 @@
+#include "nwnx_redis"
 #include "order_inc"
 
-// player system functions
-void   OrderPlayerSystemSetValue(object oPC, string sSystem, string sKey, string sValue);
-void   OrderPlayerSystemRemoveValue(object oPC, string sSystem, string sKey);
-string OrderPlayersystemObjectGetValueString(object oPC, string sSystem, string sKey);
-int    OrderPlayerSystemGetValueInt(object oPC, string sSystem, string sKey);
-// player functions
-void   OrderPlayerAddValue(object oPC, string sKey, string sKey);
-void   OrderPlayerRemoveValue(object oPC, string sKey, string sValue);
+void OrderPlayerSystemSetValue(object oPC, string sSystem, string sKey, string sValue);
+void OrderPlayerSystemRemoveValue(object oPC, string sSystem, string sKey);
+string OrderPlayerSystemGetValueString(object oPC, string sSystem, string sKey);
+int OrderPlayerSystemGetValueInt(object oPC, string sSystem, string sKey);
+void OrderPlayerSetValue(object oPC, string sKey);
+void OrderPlayerRemoveValue(object oPC, string sKey);
 string OrderPlayerGetValueString(object oPC, string sKey);
-int    OrderPlayerGetValueInt(object oPC, string sKey);
-void   OrderPlayerDeleteCharacter(object oPC);
+int OrderPlayerGetValueInt(object oPC, string sKey);
+void OrderPlayerDeleteCharacter(object oPC);
 
 // Add a player system value
 void OrderPlayerSystemSetValue(object oPC, string sSystem, string sKey, string sValue) {
@@ -23,7 +22,7 @@ void OrderPlayerSystemRemoveValue(object oPC, string sSystem, string sKey) {
 }
 
 // Get a player system value as string
-string OrderPlayersystemObjectGetValueString(object oPC, string sSystem, string sKey) {
+string OrderPlayerSystemGetValueString(object oPC, string sSystem, string sKey) {
   int zReturn = NWNX_Redis_HGET(OrderUniqueObjectEdge(oPC)+":"+sSystem,sKey);
   string sReturn = NWNX_Redis_GetResultAsInt(zReturn);
   return sReturn;
@@ -37,12 +36,12 @@ int OrderPlayerSystemGetValueInt(object oPC, string sSystem, string sKey) {
 }
 
 // Add a value to the core player hash
-void OrderPlayerAddValue(object oPC, string sKey, string sKey) {
-  NWNX_Redis_HMSET(OrderUniqueObjectEdge(oPC),sKey,sKey);
+void OrderPlayerSetValue(object oPC, string sKey, string sValue) {
+  NWNX_Redis_HMSET(OrderUniqueObjectEdge(oPC),sKey,sValue);
 }
 
 // Remove a value from the core player hash
-void OrderPlayerRemoveValue(object oPC, string sKey, string sValue) {
+void OrderPlayerRemoveValue(object oPC, string sKey) {
   NWNX_Redis_HDEL(OrderUniqueObjectEdge(oPC),sKey);
 }
 

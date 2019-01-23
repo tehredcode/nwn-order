@@ -11,20 +11,20 @@ const string sQuestObject3 = "the_high_wizard";
 int QuestOnePhaseOne(object oPC) {
   //seed some values into the quest
   // quest main hash stuff
-  OrderQuestAddValue(oPC, sQuest, "Name", "The Weed Wizard's Coven");
-  OrderQuestAddValue(oPC, sQuest, "MainObjective", "Get to the smokey mountains, attempt to gain entry to the high tower.");
-  OrderQuestAddValue(oPC, sQuest, "Status", "1");
-  OrderQuestAddValue(oPC, sQuest, "StartTime", IntToString(NWNX_Time_GetTimeStamp());
-  OrderQuestAddValue(oPC, sQuest, "UUID", OrderObjectUUID(6));  
-  OrderQuestAddValue(oPC, sQuest, "ReadableStatus", "You need more herb");
+  OrderQuestSetValue(oPC, sQuest, "Name", "The Weed Wizard's Coven");
+  OrderQuestSetValue(oPC, sQuest, "MainObjective", "Get to the smokey mountains, attempt to gain entry to the high tower.");
+  OrderQuestSetValue(oPC, sQuest, "Status", "1");
+  OrderQuestSetValue(oPC, sQuest, "StartTime", IntToString(NWNX_Time_GetTimeStamp());
+  OrderQuestSetValue(oPC, sQuest, "UUID", OrderObjectUUID(6));  
+  OrderQuestSetValue(oPC, sQuest, "ReadableStatus", "You need more herb");
   
   // quest object hash stuff
-  OrderQuestObjectAddValue(oPC,sQuest,sQuestItem1,"ObjectiveType","Obtain");
-  OrderQuestObjectAddValue(oPC,sQuest,sQuestItem1,"status","1");
-  OrderQuestObjectAddValue(oPC,sQuest,sQuestItem2,"ObjectiveType","Obtain");
-  OrderQuestObjectAddValue(oPC,sQuest,sQuestItem2,"status","1");
-  OrderQuestObjectAddValue(oPC,sQuest,sQuestItem3,"ObjectiveType","Kill");
-  OrderQuestObjectAddValue(oPC,sQuest,sQuestItem3,"status","1");
+  OrderQuestObjectSetValue(oPC,sQuest,sQuestItem1,"ObjectiveType","Obtain");
+  OrderQuestObjectSetValue(oPC,sQuest,sQuestItem1,"status","1");
+  OrderQuestObjectSetValue(oPC,sQuest,sQuestItem2,"ObjectiveType","Obtain");
+  OrderQuestObjectSetValue(oPC,sQuest,sQuestItem2,"status","1");
+  OrderQuestObjectSetValue(oPC,sQuest,sQuestItem3,"ObjectiveType","Kill");
+  OrderQuestObjectSetValue(oPC,sQuest,sQuestItem3,"status","1");
   return 1;
 }
 
