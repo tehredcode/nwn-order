@@ -1,23 +1,14 @@
 package main
 
 import (
-	"fmt"
-
-	"github.com/caarlos0/env"
 	"github.com/go-redis/redis"
 	log "github.com/sirupsen/logrus"
 )
 
 func initPubsub() {
-	cfg := config{}
-	err := env.Parse(&cfg)
-
-	if err != nil {
-		fmt.Printf("%+v\n", err)
-	}
 
 	client := redis.NewClient(&redis.Options{
-		Addr: "redis:" + cfg.RedisPort,
+		Addr: "redis:" + Conf.RedisPort,
 	})
 	defer client.Close()
 
@@ -47,15 +38,8 @@ func initPubsub() {
 }
 
 func sendPubsub(LogMessage string, PubsubChannel string, PubsubMessage string) {
-	cfg := config{}
-	err := env.Parse(&cfg)
-
-	if err != nil {
-		fmt.Printf("%+v\n", err)
-	}
-
 	client := redis.NewClient(&redis.Options{
-		Addr: "redis:" + cfg.RedisPort,
+		Addr: "redis:" + Conf.RedisPort,
 	})
 	defer client.Close()
 
