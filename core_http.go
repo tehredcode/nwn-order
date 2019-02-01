@@ -1,18 +1,43 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/gorilla/mux"
 )
 
-func initWebhook() {
-	http.HandleFunc("/webhook", webhookHandler)
-	log.WithFields(log.Fields{"Started": 1, "Port": Conf.OrderPort, "path": "/webhook"}).Info("Order:Webserver")
+// Server struct
+type Server struct {
+	ModuleName string
+	BootTime   string
+	BootDate   string
+	Players    string
+}
 
-	http.ListenAndServe(":"+Conf.OrderPort, nil)
+type server []Server
+
+func getServerStats(w http.ResponseWriter, r *http.Request) {
+	data := server{
+		Server{ModuleName: Conf.ModuleName},
+		Server{BootTime: ModuleBootTime()},
+		Server{BootDate: ModuleBootDate()},
+		Server{Players: ModulePlayers()},
+	}
+	json.NewEncoder(w).Encode(data)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(data)
+}
+
+func setServerStats(w http.ResponseWriter, r *http.Request) {
+
 }
 
 func initHTTP() {
-	initWebhook()
+	router := mux.NewRouter()
+	router.HandleFunc("/webhook", webhookHandler)
+	router.HandleFunc("/api/server", getServerStats).Methods("GET")
+	router.HandleFunc("/api/server", setServerStats).Methods("POST")
+	http.ListenAndServe(":"+Conf.OrderPort, router)
 }

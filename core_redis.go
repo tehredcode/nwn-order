@@ -5,14 +5,56 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func initPubsub() {
+// RedisClient struct
+type RedisClient struct {
+	Client *redis.Client
+}
 
+// NewRedisClient test
+func NewRedisClient() (*RedisClient, error) {
 	client := redis.NewClient(&redis.Options{
-		Addr: "redis:" + Conf.RedisPort,
+		Addr: "redis:" + Conf.ModuleName,
 	})
-	defer client.Close()
 
-	pubSub := client.Subscribe(
+	_, err := client.Ping().Result()
+
+	if err != nil {
+		return nil, err
+	}
+
+	r := RedisClient{
+		Client: client,
+	}
+
+	return &r, nil
+}
+
+// HGet is a thin wrapper around redis.HGet of `github.com/go-redis/redis`.
+func (r *RedisClient) HGet(key, field string) (string, error) {
+	value, err := r.Client.HGet(key, field).Result()
+
+	return value, err
+}
+
+// HSet is a thin wrapper around redis.HSet of `github.com/go-redis/redis`.
+func (r *RedisClient) HSet(key, field, value string) (bool, error) {
+	result, err := r.Client.HSet(key, field, value).Result()
+
+	return result, err
+}
+
+// HExists is a thin wrapper around redis.HExists of `github.com/go-redis/redis`.
+func (r *RedisClient) HExists(key, field string) (bool, error) {
+	result, err := r.Client.HExists(key, field).Result()
+
+	return result, err
+}
+
+func initPubsub() {
+	r := redis.NewClient(&redis.Options{Addr: "redis:" + Conf.ModuleName})
+	defer r.Close()
+
+	pubSub := r.Subscribe(
 		"Discord:Out",
 		"Log:Debug",
 		"Log:Info",
@@ -38,14 +80,11 @@ func initPubsub() {
 }
 
 func sendPubsub(LogMessage string, PubsubChannel string, PubsubMessage string) {
-	client := redis.NewClient(&redis.Options{
-		Addr: "redis:" + Conf.RedisPort,
-	})
-	defer client.Close()
-
-	if err := client.Publish(PubsubChannel, PubsubMessage).Err(); err != nil {
+	r := redis.NewClient(&redis.Options{Addr: "redis:" + Conf.ModuleName})
+	err := r.Publish(PubsubChannel, PubsubMessage).Err()
+	if err != nil {
+		log.WithFields(log.Fields{"Channel": PubsubChannel, "Message": PubsubMessage}).Error(LogMessage)
 		panic(err)
 	}
-
 	log.WithFields(log.Fields{"Channel": PubsubChannel, "Message": PubsubMessage}).Info(LogMessage)
 }

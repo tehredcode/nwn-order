@@ -1,4 +1,7 @@
 void InitOrder() {
+  // chat
+  NWNX_Chat_RegisterChatScript(o_chat);
+
   // random server values we want
   string sBootTime = NWNX_Time_GetSystemTime();
   string sBootDate = NWNX_Time_GetSystemDate();

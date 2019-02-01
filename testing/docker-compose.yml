@@ -1,0 +1,41 @@
+version: '3'
+services:
+  redis:
+    hostname: redis
+    image: redis:latest
+    command: ["redis-server", "--appendonly", "no"]
+    hostname: redis
+    logging:
+      driver: "none"
+    volumes:
+      - ${PWD-.}/redis:/data
+    restart: always
+    ports:
+      - "6379:6379"
+  nwserver:
+    hostname: urothis/nwn-order:module
+    image: nwnxee/unified:latest
+    env_file: ${PWD-.}/config/nwserver.env
+    logging:
+      driver: "none"
+    links:
+      - "nwn-order:nwn-order"
+      - "redis:redis"
+    volumes:
+      - ${PWD-.}/logs:/nwn/run/logs.0
+      - ${PWD-.}/server/:/nwn/home
+      - ${PWD-.}/logs:/nwn/data/bin/linux-x86/logs.0
+    restart: always
+    ports:
+      - "5121:5121/udp"
+  nwn-order:
+    hostname: nwn-order
+    image: urothis/nwn-order:dev
+    env_file: ${PWD-.}/config/nwn-order.env
+    stdin_open: true
+    tty: true
+    restart: always
+    ports:
+      - "5750:5750/tcp"
+    volumes:
+      - ${PWD-.}/logs:/logs/

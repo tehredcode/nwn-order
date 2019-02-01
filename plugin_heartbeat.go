@@ -11,31 +11,31 @@ func initHeartbeat() {
 
 	c := cron.New()
 	if Conf.HbOneMinute == true {
-		c.AddFunc("@every 1m", func() { sendPubsub("Heartbeat", "heartbeat", "1") })
+		c.AddFunc("@every 1m", func() { sendPubsub("Heartbeat", "Heartbeat", "1") })
 	}
 	log.WithFields(log.Fields{"Heartbeat": "1", "Enabled": Conf.HbOneMinute}).Info("Heartbeat")
 	if Conf.HbFiveMinute == true {
-		c.AddFunc("@every 5m", func() { sendPubsub("Heartbeat", "heartbeat", "5") })
+		c.AddFunc("@every 5m", func() { sendPubsub("Heartbeat", "Heartbeat", "5") })
 	}
 	log.WithFields(log.Fields{"Heartbeat": "5", "Enabled": Conf.HbFiveMinute}).Info("Heartbeat")
 	if Conf.HbThirtyMinute == true {
-		c.AddFunc("@every 30m", func() { sendPubsub("Heartbeat", "heartbeat", "30") })
+		c.AddFunc("@every 30m", func() { sendPubsub("Heartbeat", "Heartbeat", "30") })
 	}
 	log.WithFields(log.Fields{"Heartbeat": "30", "Enabled": Conf.HbThirtyMinute}).Info("Heartbeat")
 	if Conf.HbOneHour == true {
-		c.AddFunc("@every 1h", func() { sendPubsub("Heartbeat", "heartbeat", "60") })
+		c.AddFunc("@every 1h", func() { sendPubsub("Heartbeat", "Heartbeat", "60") })
 	}
 	log.WithFields(log.Fields{"Heartbeat": "60", "Enabled": Conf.HbOneHour}).Info("Heartbeat")
 	if Conf.HbSixHour == true {
-		c.AddFunc("@every 6h", func() { sendPubsub("Heartbeat", "heartbeat", "360") })
+		c.AddFunc("@every 6h", func() { sendPubsub("Heartbeat", "Heartbeat", "360") })
 	}
 	log.WithFields(log.Fields{"Heartbeat": "360", "Enabled": Conf.HbSixHour}).Info("Heartbeat")
 	if Conf.HbTwelveHour == true {
-		c.AddFunc("@every 12h", func() { sendPubsub("Heartbeat", "heartbeat", "720") })
+		c.AddFunc("@every 12h", func() { sendPubsub("Heartbeat", "Heartbeat", "720") })
 	}
 	log.WithFields(log.Fields{"Heartbeat": "720", "Enabled": Conf.HbTwelveHour}).Info("Heartbeat")
 	if Conf.HbTwentyfourHour == true {
-		c.AddFunc("@every 24h", func() { sendPubsub("Heartbeat", "heartbeat", "1440") })
+		c.AddFunc("@every 24h", func() { sendPubsub("Heartbeat", "Heartbeat", "1440") })
 	}
 	log.WithFields(log.Fields{"Heartbeat": "1440", "Enabled": Conf.HbTwentyfourHour}).Info("Heartbeat")
 	c.Start()
