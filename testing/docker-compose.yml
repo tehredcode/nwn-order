@@ -30,7 +30,8 @@ services:
   nwn-order:
     hostname: nwn-order
     image: urothis/nwn-order:dev
-    env_file: ${PWD-.}/config/nwn-order.env
+    env_file: 
+      - ${PWD-.}/config/nwn-order.env
     stdin_open: true
     tty: true
     restart: always
