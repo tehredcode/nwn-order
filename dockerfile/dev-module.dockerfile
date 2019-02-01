@@ -40,15 +40,10 @@
          NWNX_REDIS_HOST=redis \
          NWNX_REDIS_PORT=6379 \
          NWNX_REDIS_PUBSUB_CHANNELS=Heartbeat,Discord:Out \
-         # Environmental Variables
-         # Order
          NWN_ORDER_PORT=5750 \
-         NWN_ORDER_MODULE_NAME=Order \ #GetModuleName(); || o_inc.nss:Line 1 
-         # Redis
+         NWN_ORDER_MODULE_NAME=Order \
          NWN_ORDER_REDIS_PORT=6379 \
-         # API
          NWN_ORDER_WEBHOOKS_GITHUB= \
-         # Heartbeat
          NWN_ORDER_PLUGIN_HEARTBEAT_ENABLED=1 \
          NWN_ORDER_PLUGIN_HEARTBEAT_VERBOSE=0 \
          NWN_ORDER_PLUGIN_HEARTBEAT_ONE_MINUTE=1 \
@@ -58,6 +53,5 @@
          NWN_ORDER_PLUGIN_HEARTBEAT_SIX_HOUR=1 \
          NWN_ORDER_PLUGIN_HEARTBEAT_TWELVE_HOUR=1 \
          NWN_ORDER_PLUGIN_HEARTBEAT_TWENTYFOUR_HOUR=1 \
-         # Logging
          NWN_ORDER_PLUGIN_LOG_ENABLED=1 \
          NWN_ORDER_PLUGIN_LOG_TARGET=wip
