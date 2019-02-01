@@ -13,9 +13,8 @@ services:
     ports:
       - "6379:6379"
   nwserver:
-    hostname: urothis/nwn-order:module
-    image: nwnxee/unified:latest
-    env_file: ${PWD-.}/config/nwserver.env
+    hostname: nwserver
+    image: urothis/nwn-order:dev-module
     logging:
       driver: "none"
     links:
