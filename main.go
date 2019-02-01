@@ -4,6 +4,9 @@ import (
 	"net"
 	"strconv"
 	"time"
+	"os"
+	"os/signal"
+	"syscall"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -11,6 +14,9 @@ import (
 func initMain() {
 	// app started
 	log.WithFields(log.Fields{"Booted": 1}).Info("Order")
+
+	// start pubsub
+	go initPubsub() 
 
 	// start the web stuff
 	go initHTTP()
@@ -29,15 +35,8 @@ func initMain() {
 	log.WithFields(log.Fields{"Connected": 1, "Attempt": S}).Info("Order:Redis")
 	conn.Close()
 
-	// start pubsub
-	go initPubsub()
-
 	// start plugins
 	go initPlugins()
-
-	for {
-		time.Sleep(time.Second)
-	}
 }
 
 func initPlugins() {
@@ -65,7 +64,8 @@ func initPlugins() {
 }
 
 func main() {
-	done := make(chan bool)
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	go initMain()
 	<-done // Block forever, not sure if this is best practice.
 }

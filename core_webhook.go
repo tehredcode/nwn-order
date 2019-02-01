@@ -1,98 +1,89 @@
 package main
 
 import (
-	"crypto/hmac"
-	"crypto/sha1"
-	"encoding/hex"
-	"errors"
-	"io"
-	"io/ioutil"
 	"net/http"
-	"strings"
+	"gopkg.in/go-playground/webhooks.v5/bitbucket"
+	"gopkg.in/go-playground/webhooks.v5/docker"
+	"gopkg.in/go-playground/webhooks.v5/github"
+	"gopkg.in/go-playground/webhooks.v5/gitlab"
 
 	log "github.com/sirupsen/logrus"
 )
 
-// Replace with your hook's secret
-var secret = Conf.GithubWebhookSecret
-
-func signBody(secret, body []byte) []byte {
-
-	computed := hmac.New(sha1.New, secret)
-	computed.Write(body)
-	return []byte(computed.Sum(nil))
-}
-
-func verifySignature(secret []byte, signature string, body []byte) bool {
-
-	const signaturePrefix = "sha1="
-	const signatureLength = 45 // len(SignaturePrefix) + len(hex(sha1))
-
-	if len(signature) != signatureLength || !strings.HasPrefix(signature, signaturePrefix) {
-		return false
-	}
-
-	actual := make([]byte, 20)
-	hex.Decode(actual, []byte(signature[5:]))
-
-	return hmac.Equal(signBody(secret, body), actual)
-}
-
-type hookContext struct {
-	Signature string
-	Event     string
-	ID        string
-	Payload   []byte
-}
-
-func parseGithubHook(secret []byte, req *http.Request) (*hookContext, error) {
-	hc := hookContext{}
-
-	if hc.Signature = req.Header.Get("x-hub-signature"); len(hc.Signature) == 0 {
-		return nil, errors.New("no signature")
-	}
-
-	if hc.Event = req.Header.Get("x-github-event"); len(hc.Event) == 0 {
-		return nil, errors.New("no event")
-	}
-
-	if hc.ID = req.Header.Get("x-github-delivery"); len(hc.ID) == 0 {
-		return nil, errors.New("no event Id")
-	}
-
-	body, err := ioutil.ReadAll(req.Body)
-
+func BitBucketWebhookHandler(w http.ResponseWriter, r *http.Request) {
+	hook, _ := bitbucket.New()
+	payload, err := hook.Parse(r, bitbucket.PullRequestCreatedEvent, bitbucket.RepoPushEvent)
 	if err != nil {
-		return nil, err
+		if err == bitbucket.ErrEventNotFound {
+			// ok event wasn't one of the ones asked to be parsed
+		}
 	}
-
-	if !verifySignature(secret, hc.Signature, body) {
-		return nil, errors.New("Invalid signature")
+	switch payload.(type) {
+	case bitbucket.PullRequest: 
+		pullRequest := payload.(bitbucket.PullRequest)
+		// Do whatever you want from here...
+		log.WithFields(log.Fields{"Webhook": "Bitbucket", "PullRequest": pullRequest }).Info("Order:Webhook")
+	case bitbucket.RepoPushPayload:
+		push := payload.(bitbucket.RepoPushPayload)
+		// Do whatever you want from here...
+		log.WithFields(log.Fields{"Webhook": "Bitbucket", "Push": push }).Info("Order:Webhook")
 	}
-
-	hc.Payload = body
-
-	return &hc, nil
 }
 
-func webhookHandler(w http.ResponseWriter, r *http.Request) {
-
-	hc, err := parseGithubHook([]byte(secret), r)
-
-	w.Header().Set("Content-type", "application/json")
-
+func DockerhubWebhookHandler(w http.ResponseWriter, r *http.Request) {
+	hook, _ := docker.New()
+	payload, err := hook.Parse(r, docker.BuildEvent)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		log.Printf("Failed processing hook! ('%s')", err)
-		io.WriteString(w, "{}")
-		return
+		if err == docker.ErrParsingPayload {
+			// ok event wasn't one of the ones asked to be parsed
+		}
 	}
+	switch payload.(type) {
+	case docker.BuildPayload: 
+		build := payload.(docker.BuildPayload)
+		// Do whatever you want from here...
+		log.WithFields(log.Fields{"Webhook": "Dockerhub", "Building": build, "Repository": build.Repository }).Info("Order:Webhook")
+	}
+}
 
-	log.Printf("Received %s", hc.Event)
+func GithubWebhookHandler(w http.ResponseWriter, r *http.Request) {
+	hook, _ := github.New(github.Options.Secret(Conf.GithubWebhookSecret))
 
-	// parse `hc.Payload` or do additional processing here
+	payload, err := hook.Parse(r, github.PullRequestEvent, github.PushEvent)
+		if err != nil {
+			if err == github.ErrEventNotFound {
+				// ok event wasn't one of the ones asked to be parsed
+			}
+		}
+		switch payload.(type) {
+		case github.PullRequestPayload: 
+			pullRequest := payload.(github.PullRequestPayload)
+			// Do whatever you want from here...
+			log.WithFields(log.Fields{"Webhook": "Github", "PullRequest": pullRequest }).Info("Order:Webhook")
+		case github.PushPayload:
+			push := payload.(github.PushPayload)
+			// Do whatever you want from here...
+			log.WithFields(log.Fields{"Webhook": "Github", "Push": push }).Info("Order:Webhook")
+	}
+}
 
-	w.WriteHeader(http.StatusOK)
-	io.WriteString(w, "{}")
-	return
+func gitlabWebhookHandler(w http.ResponseWriter, r *http.Request) {
+	hook, _ := gitlab.New(gitlab.Options.Secret(Conf.GithubWebhookSecret))
+
+	payload, err := hook.Parse(r, gitlab.PushEvents, gitlab.MergeRequestEvents)
+		if err != nil {
+			if err == gitlab.ErrEventNotFound {
+				// ok event wasn't one of the ones asked to be parsed
+			}
+		}
+		switch payload.(type) {
+		case gitlab.PushEventPayload: 
+			pullRequest := payload.(gitlab.PushEventPayload)
+			// Do whatever you want from here...
+			log.WithFields(log.Fields{"Webhook": "Gitlab", "PullRequest": pullRequest }).Info("Order:Webhook")
+		case gitlab.MergeRequestEventPayload:
+			push := payload.(gitlab.PushEventPayload)
+			// Do whatever you want from here...
+			log.WithFields(log.Fields{"Webhook": "Gitlab", "Push": push }).Info("Order:Webhook")
+	}
 }

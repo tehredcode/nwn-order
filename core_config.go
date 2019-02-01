@@ -10,22 +10,18 @@ import (
 type config struct {
 	// core
 	OrderPort string `env:"NWN_ORDER_PORT" envDefault:"5750"`
-
 	// redis
 	RedisPort string `env:"NWN_ORDER_REDIS_PORT" envDefault:"6379"`
-
 	// module name
 	ModuleName string `env:"NWN_ORDER_MODULE_NAME" envDefault:"DockerDemo"`
-
 	// Webhooks
 	GithubWebhookSecret    string `env:"NWN_ORDER_GITHUB_WEBHOOK_SECRET" envDefault:""`
-	DockerHubWebhookSecret string `env:"NWN_ORDER_DOCKERHUB_WEBHOOK_SECRET" envDefault:""`
+	DockerhubWebhookSecret string `env:"NWN_ORDER_DOCKERHUB_WEBHOOK_SECRET" envDefault:""`
 
 	// Discord
 	PluginDiscord  bool   `env:"NWN_ORDER_PLUGIN_DISCORD_ENABLED" envDefault:"1"`
 	DiscordBotKey  string `env:"NWN_ORDER_PLUGIN_DISCORD_BOT_KEY" envDefault:""`
 	DiscordBotRoom string `env:"NWN_ORDER_PLUGIN_DISCOD_BOT_ROOM" envDefault:""`
-
 	// Heartbeat
 	PluginHearbeat   bool `env:"NWN_ORDER_PLUGIN_HEARTBEAT_ENABLED" envDefault:"1"`
 	HbVerbose        bool `env:"NWN_ORDER_PLUGIN_HEARTBEAT_VERBOSE" envDefault:"false"`
@@ -36,7 +32,6 @@ type config struct {
 	HbSixHour        bool `env:"NWN_ORDER_PLUGIN_HEARTBEAT_SIX_HOUR" envDefault:"true"`
 	HbTwelveHour     bool `env:"NWN_ORDER_PLUGIN_HEARTBEAT_TWELVE_HOUR" envDefault:"true"`
 	HbTwentyfourHour bool `env:"NWN_ORDER_PLUGIN_HEARTBEAT_TWENTYFOUR_HOUR" envDefault:"true"`
-
 	// Logs
 	PluginLogs   bool   `env:"NWN_ORDER_PLUGIN_LOG_ENABLED" envDefault:"1"`
 	Pluginegress string `env:"NWN_ORDER_PLUGIN_LOG_EGRESS" envDefault:""`
