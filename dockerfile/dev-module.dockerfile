@@ -2,7 +2,9 @@
     FROM alpine:3.8 as source
     RUN apk update && apk upgrade && \
         apk add --no-cache bash git openssh
-    RUN git clone  https://github.com/Urothis/nwn-order.git 
+    RUN git clone  https://github.com/Urothis/nwn-order.git && \
+        cd nwn-order && \
+        git checkout dev 
     ENTRYPOINT ["sleep 10"]
 
     FROM jakkn/nwn-devbase as modulebuild
