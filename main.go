@@ -1,9 +1,6 @@
 package main
 
 import (
-	"net"
-	"strconv"
-	"time"
 	"os"
 	"os/signal"
 	"syscall"
@@ -15,47 +12,40 @@ func initMain() {
 	// app started
 	log.WithFields(log.Fields{"Booted": 1}).Info("Order")
 
-	// start pubsub
-	go initPubsub() 
+	go initConf()
+	log.WithFields(log.Fields{"Config": 1}).Info("Order")
 
 	// start the web stuff
 	go initHTTP()
+	log.WithFields(log.Fields{"API": 1}).Info("Order")
+
+	// start pubsub
+	go initPubsub() 
+	log.WithFields(log.Fields{"Pubsub": 1}).Info("Order")
 
 	// connect to redis
-	S := 0
-	conn, err := net.Dial("udp", "redis:"+Conf.RedisPort)
-	for retry := 1; err != nil; retry++ {
-		S := strconv.Itoa(retry)
-		log.WithFields(log.Fields{"Connected": 0, "Attempt": S}).Warn("Order:Redis")
-		if retry > 3 {
-			log.WithFields(log.Fields{"Connected": 0, "Attempt": 5}).Fatal("Order:Redis")
-		}
-		time.Sleep(5 * time.Second)
-	}
-	log.WithFields(log.Fields{"Connected": 1, "Attempt": S}).Info("Order:Redis")
-	conn.Close()
 
 	// start plugins
-	go initPlugins()
+	//go initPlugins()
 }
 
 func initPlugins() {
-
-	if Conf.PluginDiscord == true {
+	c := Config{}
+	if c.PluginDiscord == true {
 		log.WithFields(log.Fields{"Enabled": 1}).Info("Order:Discord")
 		go initDiscord()
 	} else {
 		log.WithFields(log.Fields{"Enabled": 0}).Info("Order:Discord")
 	}
 
-	if Conf.PluginHearbeat == true {
+	if c.PluginHearbeat == true {
 		log.WithFields(log.Fields{"Enabled": 1}).Info("Order:Heartbeat")
 		go initHeartbeat()
 	} else {
 		log.WithFields(log.Fields{"Enabled": 0}).Info("Order:Heartbeat")
 	}
 
-	if Conf.PluginLogs == true {
+	if c.PluginLogs == true {
 		log.WithFields(log.Fields{"Enabled": 1}).Info("Order:Logs")
 		go initLog()
 	} else {

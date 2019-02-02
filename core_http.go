@@ -19,8 +19,9 @@ type Server struct {
 type server []Server
 
 func getServerStats(w http.ResponseWriter, r *http.Request) {
+	c := Config{}
 	data := server{
-		Server{ModuleName: Conf.ModuleName},
+		Server{ModuleName: c.ModuleName},
 		Server{BootTime: ModuleBootTime()},
 		Server{BootDate: ModuleBootDate()},
 		Server{Players: ModulePlayers()},
@@ -35,14 +36,13 @@ func setServerStats(w http.ResponseWriter, r *http.Request) {
 }
 
 func initHTTP() {
-	router := mux.NewRouter()
-	router.HandleFunc("/webhook/bitbucket", GithubWebhookHandler)
-	router.HandleFunc("/webhook/dockerhub", GithubWebhookHandler)
-	router.HandleFunc("/webhook/github", GithubWebhookHandler)
-	router.HandleFunc("/webhook/gitlab", GithubWebhookHandler)
-	router.HandleFunc("/webhook/gogs", GithubWebhookHandler)
-	router.HandleFunc("/api/server", getServerStats).Methods("GET")
-	router.HandleFunc("/api/server", setServerStats).Methods("POST")
-	http.ListenAndServe(":"+Conf.OrderPort, router)
-	log.WithFields(log.Fields{"Port": Conf.OrderPort, "Started": 1}).Fatal("Order:API")
+	c := Config{}
+	r := mux.NewRouter()
+	r.HandleFunc("/webhook/dockerhub", DockerhubWebhookHandler)
+	//r.HandleFunc("/webhook/github", GithubWebhookHandler)
+	//r.HandleFunc("/webhook/gitlab", GitlabWebhookHandler)
+	//r.HandleFunc("/api/server", getServerStats).Methods("GET")
+	//r.HandleFunc("/api/server", setServerStats).Methods("POST")
+	http.ListenAndServe("localhost:5750", r)
+	log.WithFields(log.Fields{"Port": c.OrderPort, "Started": 1}).Info("Order:API")
 }

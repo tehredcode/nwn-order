@@ -21,8 +21,9 @@ func mapSubexpNames(m, n []string) map[string]string {
 }
 
 func initDiscord() {
-	log.WithFields(log.Fields{"BotKey": Conf.DiscordBotKey, "started": "1"}).Info("Order:Discord")
-	discord, err := discordgo.New("Bot " + Conf.DiscordBotKey)
+	c := Config{}
+	log.WithFields(log.Fields{"BotKey": c.DiscordBotKey, "started": "1"}).Info("Order:Discord")
+	discord, err := discordgo.New("Bot " + c.DiscordBotKey)
 	errCheck("error creating discord session", err)
 	user, err := discord.User("@me")
 	errCheck("error retrieving account", err)
@@ -55,13 +56,14 @@ func errCheck(msg string, err error) {
 }
 
 func replyHandler(discord *discordgo.Session, message *discordgo.MessageCreate) {
+	c := Config{}
 	user := message.Author
 	if user.ID == botID || user.Bot {
 		//Do nothing because the bot is talking
 		return
 	}
 
-	if message.ChannelID == Conf.DiscordBotRoom {
+	if message.ChannelID == c.DiscordBotRoom {
 		sendPubsub(message.ChannelID, "Discord:Out", "["+message.Author.Username+"] "+message.Content)
 		log.WithFields(log.Fields{"Message Content": message.Content, "Message": message.Message, "Author": message.Author}).Info("Order:Discord:Message")
 		return
@@ -69,5 +71,6 @@ func replyHandler(discord *discordgo.Session, message *discordgo.MessageCreate) 
 }
 
 func inHandler(discord *discordgo.Session, m string) {
-	discord.ChannelMessageSend(Conf.DiscordBotRoom, m)
+	c := Config{}
+	discord.ChannelMessageSend(c.DiscordBotRoom, m)
 }
