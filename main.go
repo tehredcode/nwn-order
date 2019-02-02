@@ -55,5 +55,5 @@ func main() {
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	go initMain()
-	<-done // Block forever, not sure if this is best practice.
+	<-done
 }

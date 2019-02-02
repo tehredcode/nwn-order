@@ -5,8 +5,6 @@ services:
     image: redis:latest
     command: ["redis-server", "--appendonly", "no"]
     hostname: redis
-    logging:
-      driver: "none"
     volumes:
       - ${PWD-.}/redis:/data
     restart: always
@@ -15,8 +13,6 @@ services:
   nwserver:
     hostname: nwserver
     image: urothis/nwn-order:dev-module
-    logging:
-      driver: "none"
     links:
       - "nwn-order:nwn-order"
       - "redis:redis"
