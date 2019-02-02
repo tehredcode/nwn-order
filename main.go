@@ -23,10 +23,8 @@ func initMain() {
 	go initPubsub() 
 	log.WithFields(log.Fields{"Pubsub": 1}).Info("Order")
 
-	// connect to redis
-
 	// start plugins
-	//go initPlugins()
+	go initPlugins()
 }
 
 func initPlugins() {
