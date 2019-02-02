@@ -9,7 +9,7 @@ import (
 type Config struct {
 	OrderPort string `env:"NWN_ORDER_PORT" envDefault:"5750"`
 	RedisPort string `env:"NWN_ORDER_REDIS_PORT" envDefault:"6379"`
-	RedisHost string `env:"NWN_ORDER_REDIS_HOST" envDefault:"Order"`
+	RedisHost string `env:"NWN_ORDER_REDIS_HOST" envDefault:"redis"`
 	ModuleName string `env:"NWN_ORDER_MODULE_NAME"`
 	BitbucketWebhookSecret string `env:"NWN_ORDER_BITBUCKET_WEBHOOK_SECRET"`
 	GithubWebhookSecret    string `env:"NWN_ORDER_GITHUB_WEBHOOK_SECRET"`

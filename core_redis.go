@@ -67,7 +67,6 @@ func initPubsub() {
 		fmt.Printf("%+v\n", err)
 	}
 	addr := c.RedisHost+":"+c.RedisPort
-
 	r := redis.NewClient(&redis.Options{
 		Addr: addr,
 	})

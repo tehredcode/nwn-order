@@ -35,6 +35,8 @@ services:
     stdin_open: true
     tty: true
     restart: always
+    links:
+      - "redis:redis"
     ports:
       - "5750:5750/tcp"
     volumes:
