@@ -42,23 +42,23 @@ Mod_Name:
   type: cexolocstr
   value:
     0: Order
-Mod_OnAcquirItem: {type: resref, value: x2_mod_def_aqu}
-Mod_OnActvtItem: {type: resref, value: x2_mod_def_act}
-Mod_OnClientEntr: {type: resref, value: x3_mod_def_enter}
+Mod_OnAcquirItem: {type: resref, value: ''}
+Mod_OnActvtItem: {type: resref, value: ''}
+Mod_OnClientEntr: {type: resref, value: ''}
 Mod_OnClientLeav: {type: resref, value: ''}
 Mod_OnCutsnAbort: {type: resref, value: ''}
 Mod_OnHeartbeat: {type: resref, value: ''}
 Mod_OnModLoad: {type: resref, value: o_load}
 Mod_OnModStart: {type: resref, value: ''}
 Mod_OnPlrChat: {type: resref, value: ''}
-Mod_OnPlrDeath: {type: resref, value: nw_o0_death}
-Mod_OnPlrDying: {type: resref, value: nw_o0_dying}
-Mod_OnPlrEqItm: {type: resref, value: x2_mod_def_equ}
+Mod_OnPlrDeath: {type: resref, value: ''}
+Mod_OnPlrDying: {type: resref, value: ''}
+Mod_OnPlrEqItm: {type: resref, value: ''}
 Mod_OnPlrLvlUp: {type: resref, value: ''}
-Mod_OnPlrRest: {type: resref, value: x2_mod_def_rest}
-Mod_OnPlrUnEqItm: {type: resref, value: x2_mod_def_unequ}
-Mod_OnSpawnBtnDn: {type: resref, value: nw_o0_respawn}
-Mod_OnUnAqreItem: {type: resref, value: x2_mod_def_unaqu}
+Mod_OnPlrRest: {type: resref, value: ''}
+Mod_OnPlrUnEqItm: {type: resref, value: ''}
+Mod_OnSpawnBtnDn: {type: resref, value: ''}
+Mod_OnUnAqreItem: {type: resref, value: ''}
 Mod_OnUsrDefined: {type: resref, value: ''}
 Mod_StartDay: {type: byte, value: 1}
 Mod_StartHour: {type: byte, value: 13}
