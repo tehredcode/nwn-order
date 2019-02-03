@@ -1,14 +1,25 @@
 #include "nwnx_redis"
+#include "o_external"
+
+int GetTagIsUUID(object oObject) {
+  return 1;
+}
+
+string OrderReturnModuleName(){
+  int zReturn = NWNX_Redis_HGET(SERVER_NAME,"ModuleName");
+  string sReturn = NWNX_Redis_GetResultAsString(zReturn);
+  return sReturn;
+}
 
 // add uuid to list of used id's
 void OrderAddUUIDtoRedis(string uuid) {
-  NWNX_Redis_HSET(RdsEdgeServer("server")+":uuid", uuid, "1");
+  NWNX_Redis_HSET(OrderReturnModuleName()+":server:uuid", uuid, "1");
 }
 
 // confirm uuid does not exist already.
 int OrderIsUUIDExists(string uuid);
 int OrderIsUUIDExists(string uuid) {
-  int nIsUnique = NWNX_Redis_HEXISTS(RdsEdgeServer(1)+":uuid", uuid);
+  int nIsUnique = NWNX_Redis_HEXISTS(OrderReturnModuleName()+":server:uuid", uuid);
   int nState = NWNX_Redis_GetResultAsInt(nIsUnique);
   return nState;
 }

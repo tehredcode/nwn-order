@@ -1,6 +1,6 @@
-#include "order_inc"
-#include "order_external"
-#include "order_alert"
+#include "o_inc"
+#include "o_external"
+#include "o_webhook_out"
 
 // channels we send log messages to
 const string sLogDebug     = "Log:Debug";
@@ -12,55 +12,55 @@ const string sDebugFatal   = "Log:Fatal";
 //  Will check length of the list and determine how many old entries to purge
 ///////////////////
 void CleanLog() {
-  string sKeyPath = RdsEdgeServer("server") + "Logs"; 
+  string sKeyPath = OrderObjectEdge(1) + "Logs";
   int nListLength = NWNX_Redis_LLEN(sKeyPath);
   NWNX_Redis_LTRIM(sKeyPath,2500,nListLength);
 }
 
 ///////////////////
-//  Log to a redis list 
+//  Log to a redis list
 //  nForever defines if we keep this error forever
 ///////////////////
 void RedisLog(string sMessage, int nLogLevel, int nForever=FALSE) {
   // get length of list
-  int nListLength = NWNX_Redis_LLEN(RdsEdgeServer("server")+"Logs");
+  int nListLength = NWNX_Redis_LLEN(OrderObjectEdge(1)+"Logs");
   // clean the temp logs if we need to
   if (nListLength > 3000) CleanLog();
 
-  switch (nLogLevel) {   
-  case 0: NWNX_Redis_RPUSH(RdsEdgeServer("server")+"Logs",sMessage);         break;
-  case 1: NWNX_Redis_RPUSH(RdsEdgeServer("server")+"CriticalLogs",sMessage); break;
+  switch (nLogLevel) {
+  case 0: NWNX_Redis_RPUSH(OrderObjectEdge(1)+"Logs",sMessage);         break;
+  case 1: NWNX_Redis_RPUSH(OrderObjectEdge(1)+"CriticalLogs",sMessage); break;
   default:
   }
 }
 
 //
 void OrderLogDebug(string sMessage){
-  OrderExternalLogDebug();
+  EOrderLogDebug(sMessage);
   NWNX_Redis_PUBLISH(sLogDebug, sMessage);
 }
 
 //
 void OrderLogInfo(string sMessage){
-  OrderExternalLogInfo();
+  EOrderLogInfo(sMessage);
   NWNX_Redis_PUBLISH(sLogInfo, sMessage);
 }
 
 //
 void OrderLogWarning(string sMessage){
-  OrderExternalLogWarning();
+  EOrderLogWarning(sMessage);
   NWNX_Redis_PUBLISH(sDebugWarning, sMessage);
 }
 
 // WARNING, THIS WILL SHUT DOWN ORDER
 void OrderLogFatal(string sMessage){
-  OrderExternalLogFatal();
+  EOrderLogFatal(sMessage);
   NWNX_Redis_PUBLISH(sDebugFatal, sMessage);
 }
 
 ///////////////////
 // Log levels:
-// 0:Debug 
+// 0:Debug
 // 1:Info
 // 2:Warning
 // 3:Fatal
@@ -71,8 +71,8 @@ void OrderLogFatal(string sMessage){
 ///////////////////
 void orderLog(string sMessage, int nLogLevel, int nWebhook=1, int nWebhookLevel=0, int nSaveError=1, int nPermSaveError=0) {
 
-  if (nWebhook) OrderSendbWebhook(nWebhookLevel, sMessage, "Order:Log: " + IntToString(nWebhookLevel));
-  if (nSaveError) RedisLog(sMessage,nLogLevel,nPermSaveError); 
+  if (nWebhook) OrderSendWebhook(nWebhookLevel, sMessage, "Order:Log: " + IntToString(nWebhookLevel));
+  if (nSaveError) RedisLog(sMessage,nLogLevel,nPermSaveError);
 
   NWNX_Redis_PUBLISH("Log:"+IntToString(nLogLevel),sMessage);
 

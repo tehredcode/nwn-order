@@ -48,7 +48,7 @@ Mod_OnClientEntr: {type: resref, value: x3_mod_def_enter}
 Mod_OnClientLeav: {type: resref, value: ''}
 Mod_OnCutsnAbort: {type: resref, value: ''}
 Mod_OnHeartbeat: {type: resref, value: ''}
-Mod_OnModLoad: {type: resref, value: x2_mod_def_load}
+Mod_OnModLoad: {type: resref, value: o_load}
 Mod_OnModStart: {type: resref, value: ''}
 Mod_OnPlrChat: {type: resref, value: ''}
 Mod_OnPlrDeath: {type: resref, value: nw_o0_death}

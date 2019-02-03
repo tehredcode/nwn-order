@@ -1,19 +1,22 @@
 //////
-// This file is for you to hook into important events that fire inside of ORDER. 
+// This file is for you to hook into important events that fire inside of ORDER.
 // You can modify this file without fear of breaking in the future.
 //////
 
+// Server Name
+const string SERVER_NAME = "order";
+
 // Log events
-void OrderLogDebug(string sMessage) {
+void EOrderLogDebug(string sMessage) {
 
 }
-void OrderLogInfo(string sMessage) {
+void EOrderLogInfo(string sMessage) {
 
 }
-void OrderLogWarning(string sMessage) {
+void EOrderLogWarning(string sMessage) {
 
 }
-void OrderLogFatal(string sMessage) {
+void EOrderLogFatal(string sMessage) {
 
 }
 

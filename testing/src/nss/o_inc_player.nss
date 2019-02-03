@@ -1,15 +1,5 @@
 #include "nwnx_redis"
-#include "order_inc"
-
-void OrderPlayerSystemSetValue(object oPC, string sSystem, string sKey, string sValue);
-void OrderPlayerSystemRemoveValue(object oPC, string sSystem, string sKey);
-string OrderPlayerSystemGetValueString(object oPC, string sSystem, string sKey);
-int OrderPlayerSystemGetValueInt(object oPC, string sSystem, string sKey);
-void OrderPlayerSetValue(object oPC, string sKey);
-void OrderPlayerRemoveValue(object oPC, string sKey);
-string OrderPlayerGetValueString(object oPC, string sKey);
-int OrderPlayerGetValueInt(object oPC, string sKey);
-void OrderPlayerDeleteCharacter(object oPC);
+#include "o_inc"
 
 // Add a player system value
 void OrderPlayerSystemSetValue(object oPC, string sSystem, string sKey, string sValue) {
@@ -24,7 +14,7 @@ void OrderPlayerSystemRemoveValue(object oPC, string sSystem, string sKey) {
 // Get a player system value as string
 string OrderPlayerSystemGetValueString(object oPC, string sSystem, string sKey) {
   int zReturn = NWNX_Redis_HGET(OrderUniqueObjectEdge(oPC)+":"+sSystem,sKey);
-  string sReturn = NWNX_Redis_GetResultAsInt(zReturn);
+  string sReturn = NWNX_Redis_GetResultAsString(zReturn);
   return sReturn;
 }
 
@@ -55,11 +45,11 @@ string OrderPlayerGetValueString(object oPC, string sKey) {
 // Get a int from the core player hash
 int OrderPlayerGetValueInt(object oPC, string sKey) {
   int zReturn = NWNX_Redis_HGET(OrderUniqueObjectEdge(oPC),sKey);
-  string sReturn = NWNX_Redis_GetResultAsInt(zReturn);
-  return sReturn;
+  int nReturn = NWNX_Redis_GetResultAsInt(zReturn);
+  return nReturn;
 }
 
 // Remove a player, Yes this deletes everything related to the character inside redis.
 void OrderPlayerDeleteCharacter(object oPC) {
-  NWNX_Redis_HDEL(RdsEdgePlayer("player",oPC));
+  NWNX_Redis_DEL(OrderUniqueObjectEdge(oPC));
 }
