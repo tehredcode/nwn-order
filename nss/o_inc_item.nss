@@ -1,37 +1,24 @@
-#include "nwnx_redis"
-#include "order_inc"
-
-// item system functions
-void   OrderPlayerSystemSetValue(object oPC, string sSystem, string sKey, string sValue);
-void   OrderPlayerSystemRemoveValue(object oPC, string sSystem, string sKey);
-string OrderPlayersystemObjectGetValueString(object oPC, string sSystem, string sKey);
-int    OrderPlayerSystemGetValueInt(object oPC, string sSystem, string sKey);
-// main Item functions
-void   OrderItemSetValue(object oItem, string sKey, string sValue);
-void   OrderItemRemoveValue(object oItem, string sKey);
-string OrderItemGetValueString(object oItem, string sKey);
-int    OrderItemGetValueInt(object oItem, string sKey);
-void   OrderItemDelete(object oItem);
+#include "o_inc"
 
 // Add an Item system value
-void OrderPlayerSystemSetValue(object oPC, string sSystem, string sKey, string sValue) {
+void OrderItemSystemSetValue(object oPC, string sSystem, string sKey, string sValue) {
   NWNX_Redis_HMSET(OrderUniqueObjectEdge(oPC)+":"+sSystem,sKey,sValue);
 }
 
 // Remove an Item system value value
-void OrderPlayerSystemRemoveValue(object oPC, string sSystem, string sKey) {
+void OrderItemSystemRemoveValue(object oPC, string sSystem, string sKey) {
   NWNX_Redis_HDEL(OrderUniqueObjectEdge(oPC)+":"+sSystem,sKey);
 }
 
 // Get an Item system value as string
-string OrderPlayersystemObjectGetValueString(object oPC, string sSystem, string sKey) {
+string OrderItemsystemObjectGetValueString(object oPC, string sSystem, string sKey) {
   int zReturn = NWNX_Redis_HGET(OrderUniqueObjectEdge(oPC)+":"+sSystem,sKey);
-  string sReturn = NWNX_Redis_GetResultAsInt(zReturn);
+  string sReturn = NWNX_Redis_GetResultAsString(zReturn);
   return sReturn;
 }
 
 // Get an Item system value as int
-int OrderPlayerSystemGetValueInt(object oPC, string sSystem, string sKey) {
+int OrderItemSystemGetValueInt(object oPC, string sSystem, string sKey) {
   int zReturn = NWNX_Redis_HGET(OrderUniqueObjectEdge(oPC)+":"+sSystem,sKey);
   int sReturn = NWNX_Redis_GetResultAsInt(zReturn);
   return sReturn;
@@ -57,11 +44,11 @@ string OrderItemGetValueString(object oItem, string sKey) {
 // Get a int from the core quest hash
 int OrderItemGetValueInt(object oItem, string sKey) {
   int zReturn = NWNX_Redis_HGET(OrderUniqueObjectEdge(oItem),sKey);
-  string sReturn = NWNX_Redis_GetResultAsInt(zReturn);
-  return sReturn;
+  int nReturn = NWNX_Redis_GetResultAsInt(zReturn);
+  return nReturn;
 }
 
 // Remove an item
 void OrderItemDelete(object oItem) {
-  NWNX_Redis_HDEL(OrderUniqueObjectEdge(oItem));
+  NWNX_Redis_DEL(OrderUniqueObjectEdge(oItem));
 }

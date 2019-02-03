@@ -1,3 +1,5 @@
+#import 
+
 void InitOrder() {
   // random server values we want
   string sBootTime = NWNX_Time_GetSystemTime();
