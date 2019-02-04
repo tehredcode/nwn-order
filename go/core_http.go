@@ -1,9 +1,13 @@
 package main
 
 import (
+	config "github.com/Urothis-nwn-Order/nwn-order/blob/dev/go/config"
+
 	"encoding/json"
+	"fmt"
 	"net/http"
 
+	"github.com/caarlos0/env"
 	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -21,7 +25,7 @@ type server []Server
 
 func getServerStats(w http.ResponseWriter, r *http.Request) {
 	c := Config{}
-	rds := redis.NewClient(&redis.Options{Addr: "redis:" + c.RedisPort})
+	rds := redis.NewClient(&redis.Options{Addr: "redis:" + config.RedisPort})
 	rkey := c.ModuleName + ":server"
 	ModuleBootTime, _ := rds.HGet(rkey, "BootTime").Result()
 	rkey = c.ModuleName + ":server"
@@ -46,6 +50,10 @@ func setServerStats(w http.ResponseWriter, r *http.Request) {
 
 func initHTTP() {
 	c := Config{}
+	err := env.Parse(&c)
+	if err != nil {
+		fmt.Printf("%+v\n", err)
+	}
 	r := mux.NewRouter()
 	r.HandleFunc("/webhook/dockerhub", DockerhubWebhookHandler)
 	r.HandleFunc("/webhook/github", GithubWebhookHandler)

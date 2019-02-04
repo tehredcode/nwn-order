@@ -5,6 +5,7 @@ RUN apt update \
     && git clone https://github.com/Urothis/nwn-order.git \
     && cd nwn-order \
     && git checkout dev \
+    && cd go \
     && go mod download \
     && go build -o ./bin/order \
     && mv bin/order /usr/local/bin/

@@ -3,7 +3,7 @@ RUN apt update \
     && apt upgrade -y \
     && rm -r /var/lib/apt/lists /var/cache/apt \
     && git clone https://github.com/Urothis/nwn-order.git \
-    && cd nwn-order \
+    && cd nwn-order/go \
     && go mod download \
     && go build -o ./bin/order \
     && mv bin/order /usr/local/bin/
