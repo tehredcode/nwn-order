@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
 )
@@ -21,9 +23,8 @@ func mapSubexpNames(m, n []string) map[string]string {
 }
 
 func initDiscord() {
-	c := Config{}
-	log.WithFields(log.Fields{"BotKey": c.DiscordBotKey, "started": "1"}).Info("Order:Discord")
-	discord, err := discordgo.New("Bot " + c.DiscordBotKey)
+	log.WithFields(log.Fields{"BotKey": os.Getenv("NWN_ORDER_PLUGIN_DISCORD_BOT_KEY"), "started": "1"}).Info("Order:Discord")
+	discord, err := discordgo.New("Bot " + os.Getenv("NWN_ORDER_PLUGIN_DISCORD_BOT_KEY"))
 	errCheck("error creating discord session", err)
 	user, err := discord.User("@me")
 	errCheck("error retrieving account", err)
@@ -56,14 +57,13 @@ func errCheck(msg string, err error) {
 }
 
 func replyHandler(discord *discordgo.Session, message *discordgo.MessageCreate) {
-	c := Config{}
 	user := message.Author
 	if user.ID == botID || user.Bot {
 		//Do nothing because the bot is talking
 		return
 	}
 
-	if message.ChannelID == c.DiscordBotRoom {
+	if message.ChannelID == os.Getenv("NWN_ORDER_PLUGIN_DISCOD_BOT_ROOM") {
 		sendPubsub(message.ChannelID, "Discord:Out", "["+message.Author.Username+"] "+message.Content)
 		log.WithFields(log.Fields{"Message Content": message.Content, "Message": message.Message, "Author": message.Author}).Info("Order:Discord:Message")
 		return
@@ -71,6 +71,5 @@ func replyHandler(discord *discordgo.Session, message *discordgo.MessageCreate) 
 }
 
 func inHandler(discord *discordgo.Session, m string) {
-	c := Config{}
-	discord.ChannelMessageSend(c.DiscordBotRoom, m)
+	discord.ChannelMessageSend(os.Getenv("NWN_ORDER_PLUGIN_DISCOD_BOT_ROOM"), m)
 }

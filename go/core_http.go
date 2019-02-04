@@ -1,14 +1,12 @@
 package main
 
 import (
-	config "github.com/Urothis-nwn-Order/nwn-order/blob/dev/go/config"
+	"fmt"
+	"os"
 
 	"encoding/json"
-	"fmt"
 	"net/http"
 
-	"github.com/caarlos0/env"
-	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
@@ -24,20 +22,24 @@ type Server struct {
 type server []Server
 
 func getServerStats(w http.ResponseWriter, r *http.Request) {
-	c := Config{}
-	rds := redis.NewClient(&redis.Options{Addr: "redis:" + config.RedisPort})
-	rkey := c.ModuleName + ":server"
-	ModuleBootTime, _ := rds.HGet(rkey, "BootTime").Result()
-	rkey = c.ModuleName + ":server"
-	ModuleBootDate, _ := rds.HGet(rkey, "BootDate").Result()
-	rkey = c.ModuleName + ":server"
-	ModulePlayers, _ := rds.HGet(rkey, "Online").Result()
+	rds2 := NewRedisClient(os.Getenv("NWN_ORDER_REDIS_HOST")+":"+os.Getenv("NWN_ORDER_REDIS_PORT"), "")
+	rkey := os.Getenv("NWN_ORDER_PORT") + ":server"
+	value, _ := rds2.HMGet(rkey,
+		"BootTime",
+		"BootDate",
+		"Online",
+	)
+	fmt.Printf("%#v", value)
+
+	//rds := redis.NewClient(&redis.Options{Addr: os.Getenv("NWN_ORDER_REDIS_HOST") + ":" + os.Getenv("NWN_ORDER_REDIS_PORT")})
+	//s, _ := rds.HMGet(rkey, "BootTime", "BootDate", "Online").Result()
+	//fmt.Printf("%#v", s)
 
 	data := server{
-		Server{ModuleName: c.ModuleName},
-		Server{BootTime: ModuleBootTime},
-		Server{BootDate: ModuleBootDate},
-		Server{Players: ModulePlayers},
+		Server{ModuleName: os.Getenv("NWN_ORDER_MODULE_NAME")},
+		//Server{BootTime: s[1]},
+		//Server{BootDate: s[2]},
+		//Server{Players: s[3]},
 	}
 	json.NewEncoder(w).Encode(data)
 	w.Header().Set("Content-Type", "application/json")
@@ -49,16 +51,11 @@ func setServerStats(w http.ResponseWriter, r *http.Request) {
 }
 
 func initHTTP() {
-	c := Config{}
-	err := env.Parse(&c)
-	if err != nil {
-		fmt.Printf("%+v\n", err)
-	}
 	r := mux.NewRouter()
 	r.HandleFunc("/webhook/dockerhub", DockerhubWebhookHandler)
 	r.HandleFunc("/webhook/github", GithubWebhookHandler)
 	r.HandleFunc("/webhook/gitlab", GitlabWebhookHandler)
 	r.HandleFunc("/api/server", getServerStats)
-	http.ListenAndServe(":"+c.OrderPort, r)
-	log.WithFields(log.Fields{"Port": c.OrderPort, "Started": 1}).Info("Order:API")
+	http.ListenAndServe(":"+os.Getenv("NWN_ORDER_PORT"), r)
+	log.WithFields(log.Fields{"Port": os.Getenv("NWN_ORDER_PORT"), "Started": 1}).Info("Order:API")
 }

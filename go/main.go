@@ -12,15 +12,12 @@ func initMain() {
 	// app started
 	log.WithFields(log.Fields{"Booted": 1}).Info("Order")
 
-	go initConf()
-	log.WithFields(log.Fields{"Config": 1}).Info("Order")
-
 	// start the web stuff
 	go initHTTP()
 	log.WithFields(log.Fields{"API": 1}).Info("Order")
 
 	// start pubsub
-	go initPubsub() 
+	go initPubsub()
 	log.WithFields(log.Fields{"Pubsub": 1}).Info("Order")
 
 	// start plugins
@@ -28,22 +25,21 @@ func initMain() {
 }
 
 func initPlugins() {
-	c := Config{}
-	if c.PluginDiscord == true {
+	if os.Getenv("NWN_ORDER_PLUGIN_DISCORD_ENABLED") == "1" {
 		log.WithFields(log.Fields{"Enabled": 1}).Info("Order:Discord")
 		go initDiscord()
 	} else {
 		log.WithFields(log.Fields{"Enabled": 0}).Info("Order:Discord")
 	}
 
-	if c.PluginHearbeat == true {
+	if os.Getenv("NWN_ORDER_PLUGIN_HEARTBEAT_ENABLED") == "1" {
 		log.WithFields(log.Fields{"Enabled": 1}).Info("Order:Heartbeat")
 		go initHeartbeat()
 	} else {
 		log.WithFields(log.Fields{"Enabled": 0}).Info("Order:Heartbeat")
 	}
 
-	if c.PluginLogs == true {
+	if os.Getenv("NWN_ORDER_PLUGIN_LOG_ENABLED") == "1" {
 		log.WithFields(log.Fields{"Enabled": 1}).Info("Order:Logs")
 		go initLog()
 	} else {

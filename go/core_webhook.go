@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"gopkg.in/go-playground/webhooks.v5/docker"
 	"gopkg.in/go-playground/webhooks.v5/github"
@@ -29,8 +30,7 @@ func DockerhubWebhookHandler(w http.ResponseWriter, r *http.Request) {
 
 // GithubWebhookHandler func
 func GithubWebhookHandler(w http.ResponseWriter, r *http.Request) {
-	c := Config{}
-	hook, _ := github.New(github.Options.Secret(c.GithubWebhookSecret))
+	hook, _ := github.New(github.Options.Secret(os.Getenv("NWN_ORDER_GITHUB_WEBHOOK_SECRET")))
 	payload, err := hook.Parse(r, github.PullRequestEvent, github.PushEvent)
 	if err != nil {
 		if err == github.ErrEventNotFound {
@@ -51,8 +51,7 @@ func GithubWebhookHandler(w http.ResponseWriter, r *http.Request) {
 
 // GitlabWebhookHandler func
 func GitlabWebhookHandler(w http.ResponseWriter, r *http.Request) {
-	c := Config{}
-	hook, _ := gitlab.New(gitlab.Options.Secret(c.GithubWebhookSecret))
+	hook, _ := gitlab.New(gitlab.Options.Secret(os.Getenv("NWN_ORDER_GITLAB_WEBHOOK_SECRET")))
 
 	payload, err := hook.Parse(r, gitlab.PushEvents, gitlab.MergeRequestEvents)
 	if err != nil {
