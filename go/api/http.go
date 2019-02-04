@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/go-redis/redis"
 	rds "github.com/urothis/nwn-order/go/redis"
 )
 
@@ -41,9 +40,4 @@ func GetServerStats(c *rds.Client, w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(data)
 
-}
-
-func redisHandler(c *redis.Client,
-	f func(c *redis.Client, w http.ResponseWriter, r *http.Request)) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { f(c, w, r) })
 }

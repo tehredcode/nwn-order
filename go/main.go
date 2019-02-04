@@ -15,56 +15,79 @@ import (
 	rds "github.com/urothis/nwn-order/go/redis"
 )
 
-func initHTTP(c *rds.Client) {
-	r := mux.NewRouter()
+package api
 
-	r.HandleFunc("/webhook/dockerhub", api.DockerhubWebhookHandler)
-	r.HandleFunc("/webhook/github", api.GithubWebhookHandler)
-	r.HandleFunc("/webhook/gitlab", api.GitlabWebhookHandler)
-	r.HandleFunc("/api/server", rds.redisHandler(client, api.GetServerStats)).Methods("POST")
+import (
+	"log"
+	"net/http"
+	"os"
 
-	http.ListenAndServe(":"+os.Getenv("NWN_ORDER_PORT"), r)
-	logrus.WithFields(logrus.Fields{"Port": os.Getenv("NWN_ORDER_PORT"), "Started": 1}).Info("Order:API")
+	"github.com/go-redis/redis"
+	"github.com/gorilla/mux"
+)
+
+type App struct {
+	Router *mux.Router
+	DB     *redis.Client
 }
 
-func initPubsub(c *rds.Client) {
-	pubSub, err := c.Subscribe()
-	err = pubSub.Subscribe(
+func (a *App) Run(addr string) {
+	logrus.Fatal(http.ListenAndServe(":8000", a.Router))
+}
+
+func (a *App) InitializeAPI() error {
+	db := redis.NewClient(&redis.Options{
+		Addr: os.Getenv("NWN_ORDER_REDIS_HOST") + ":" + os.Getenv("NWN_ORDER_REDIS_PORT"),
+	})
+
+	a.DB = db
+	a.Router = mux.NewRouter()
+	a.initializeRoutes()
+	return nil
+}
+
+func (a *App) initializeRoutes() {
+	a.Router.HandleFunc("/api/status", a.AddStatusHandler).Methods("GET")
+}
+
+// AddTodoHandler has access to DB, in your case Redis
+// you can replace the steps for Redis.
+func (a *App) AddTodoHandler() {
+	//has access to DB
+	a.DB
+}
+
+func initPubsub(a *App) {
+	p := a.db.PubsubChannel(
 		"Discord:Out",
 		"Log:Debug",
 		"Log:Info",
 		"Log:Warning",
 		"Log:Fatal",
 	)
-	if err != nil {
-		log.WithFields(log.Fields{"Connected": "0", "Please confirm redis is connected": "1"}).Fatal("Order:Redis")
-	}
-	defer pubSub.Close()
-	log.WithFields(log.Fields{"Discord:Out": "1", "Log:Debug": "1", "Log:Info": "1", "Log:Warning": "1", "Log:Fatal": "1"}).Info("Order:Redis:Pubsub:Subscribe")
-
 	for {
-		msg, err := pubSub.ReceiveMessage()
+		msg, err := p.ReceiveMessage()
 		if err != nil {
-			log.WithFields(log.Fields{"Connected": "0"}).Warn("Order:Redis:Pubsub")
+			logrus.WithFields(logrus.Fields{"Connected": "0"}).Warn("Order:Redis:Pubsub")
 		}
 		switch msg.Channel {
 		case "Discord:Out":
-			log.WithFields(log.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Payload}).Info("Order:Pubsub")
+			logrus.WithFields(logrus.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Payload}).Info("Order:Pubsub")
 		case "Log:Debug":
-			log.WithFields(log.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Payload}).Info("Order:Pubsub")
+			logrus.WithFields(logrus.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Payload}).Info("Order:Pubsub")
 		case "Log:Info":
-			log.WithFields(log.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Payload}).Info("Order:Pubsub")
+			logrus.WithFields(logrus.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Payload}).Info("Order:Pubsub")
 		case "Log:Warning":
-			log.WithFields(log.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Payload}).Info("Order:Pubsub")
+			logrus.WithFields(logrus.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Payload}).Info("Order:Pubsub")
 		case "Log:Fatal":
-			log.WithFields(log.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Payload}).Info("Order:Pubsub")
+			logrus.WithFields(logrus.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Payload}).Info("Order:Pubsub")
 		}
 		fmt.Println(msg.Channel, msg.Payload)
 	}
 }
 
 func initDiscord(c *rds.Client) {
-	log.WithFields(log.Fields{"BotKey": os.Getenv("NWN_ORDER_PLUGIN_DISCORD_BOT_KEY"), "started": "1"}).Info("Order:Discord")
+	logrus.WithFields(logrus.Fields{"BotKey": os.Getenv("NWN_ORDER_PLUGIN_DISCORD_BOT_KEY"), "started": "1"}).Info("Order:Discord")
 	discord, err := discordgo.New("Bot " + os.Getenv("NWN_ORDER_PLUGIN_DISCORD_BOT_KEY"))
 	errCheck("error creating discord session", err)
 	user, err := discord.User("@me")
@@ -75,10 +98,10 @@ func initDiscord(c *rds.Client) {
 	discord.AddHandler(func(discord *discordgo.Session, ready *discordgo.Ready) {
 		err = discord.UpdateStatus(0, "Order")
 		if err != nil {
-			log.WithFields(log.Fields{"Set Status": "0"}).Info("Order:Discord:Error")
+			logrus.WithFields(logrus.Fields{"Set Status": "0"}).Info("Order:Discord:Error")
 		}
 		servers := discord.State.Guilds
-		log.WithFields(log.Fields{"Started": 1, "Clients connected": len(servers)}).Info("Order:Discord")
+		logrus.WithFields(logrus.Fields{"Started": 1, "Clients connected": len(servers)}).Info("Order:Discord")
 	})
 
 	err = discord.Open()
