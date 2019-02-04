@@ -5,6 +5,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
+	rds "github.com/urothis/nwn-order/go/redis"
 )
 
 var (
@@ -36,7 +37,7 @@ func replyHandler(discord *discordgo.Session, message *discordgo.MessageCreate) 
 	}
 
 	if message.ChannelID == os.Getenv("NWN_ORDER_PLUGIN_DISCOD_BOT_ROOM") {
-		SendPubsub(message.ChannelID, "Discord:Out", "["+message.Author.Username+"] "+message.Content)
+		rds.SendPubsub(message.ChannelID, "Discord:Out", "["+message.Author.Username+"] "+message.Content)
 		log.WithFields(log.Fields{"Message Content": message.Content, "Message": message.Message, "Author": message.Author}).Info("Order:Discord:Message")
 		return
 	}
