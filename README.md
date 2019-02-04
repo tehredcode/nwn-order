@@ -79,7 +79,7 @@ Community involvement is appreciated.
 
 ## NWSCRIPT
 ### UUID
-This function should be passed the player objet only.
+This function should be passed the player object only.
 It will return the assigned UUID to the player.
 
 Internal scripts attach this uuid to the player tag.
