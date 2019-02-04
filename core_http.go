@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
@@ -20,11 +21,19 @@ type server []Server
 
 func getServerStats(w http.ResponseWriter, r *http.Request) {
 	c := Config{}
+	rds := redis.NewClient(&redis.Options{Addr: "redis:" + c.RedisPort})
+	rkey := c.ModuleName + ":server"
+	ModuleBootTime, _ := rds.HGet(rkey, "BootTime").Result()
+	rkey = c.ModuleName + ":server"
+	ModuleBootDate, _ := rds.HGet(rkey, "BootDate").Result()
+	rkey = c.ModuleName + ":server"
+	ModulePlayers, _ := rds.HGet(rkey, "Online").Result()
+
 	data := server{
 		Server{ModuleName: c.ModuleName},
-		Server{BootTime: ModuleBootTime()},
-		Server{BootDate: ModuleBootDate()},
-		Server{Players: ModulePlayers()},
+		Server{BootTime: ModuleBootTime},
+		Server{BootDate: ModuleBootDate},
+		Server{Players: ModulePlayers},
 	}
 	json.NewEncoder(w).Encode(data)
 	w.Header().Set("Content-Type", "application/json")
