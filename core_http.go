@@ -39,10 +39,10 @@ func initHTTP() {
 	c := Config{}
 	r := mux.NewRouter()
 	r.HandleFunc("/webhook/dockerhub", DockerhubWebhookHandler)
-	//r.HandleFunc("/webhook/github", GithubWebhookHandler)
-	//r.HandleFunc("/webhook/gitlab", GitlabWebhookHandler)
-	//r.HandleFunc("/api/server", getServerStats).Methods("GET")
-	//r.HandleFunc("/api/server", setServerStats).Methods("POST")
-	http.ListenAndServe("localhost:5750", r)
+	r.HandleFunc("/webhook/github", GithubWebhookHandler)
+	r.HandleFunc("/webhook/gitlab", GitlabWebhookHandler)
+	r.HandleFunc("/api/server", getServerStats).Methods("GET")
+	r.HandleFunc("/api/server", setServerStats).Methods("POST")
+	http.ListenAndServe(":"+c.OrderPort, r)
 	log.WithFields(log.Fields{"Port": c.OrderPort, "Started": 1}).Info("Order:API")
 }
