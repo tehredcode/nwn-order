@@ -1,14 +1,14 @@
-package main
+package api
 
 import (
-	"fmt"
-	"os"
-
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
+	"github.com/urothis/nwn-order/go/redis"
 )
 
 // Server struct
@@ -21,19 +21,14 @@ type Server struct {
 
 type server []Server
 
-func getServerStats(w http.ResponseWriter, r *http.Request) {
-	rds2 := NewRedisClient(os.Getenv("NWN_ORDER_REDIS_HOST")+":"+os.Getenv("NWN_ORDER_REDIS_PORT"), "")
+func getServerStats(c *RedisClient, w http.ResponseWriter, r *http.Request) {
 	rkey := os.Getenv("NWN_ORDER_PORT") + ":server"
-	value, _ := rds2.HMGet(rkey,
+	value, _ := c.HMGet(rkey,
 		"BootTime",
 		"BootDate",
 		"Online",
 	)
 	fmt.Printf("%#v", value)
-
-	//rds := redis.NewClient(&redis.Options{Addr: os.Getenv("NWN_ORDER_REDIS_HOST") + ":" + os.Getenv("NWN_ORDER_REDIS_PORT")})
-	//s, _ := rds.HMGet(rkey, "BootTime", "BootDate", "Online").Result()
-	//fmt.Printf("%#v", s)
 
 	data := server{
 		Server{ModuleName: os.Getenv("NWN_ORDER_MODULE_NAME")},
@@ -45,17 +40,27 @@ func getServerStats(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(data)
+
 }
 
-func setServerStats(w http.ResponseWriter, r *http.Request) {
+func redisHandler(c *redis.Client,
+	f func(c *redis.Client, w http.ResponseWriter, r *http.Request)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { f(c, w, r) })
 }
 
 func initHTTP() {
+	//Initialize Redis Client
+	client := redis.InitClient()
+	//Get current redis instance to get passed to different Gorilla-Mux Handlers
+	redisHandler := &RedisInstance{RInstance: &client}
+
 	r := mux.NewRouter()
 	r.HandleFunc("/webhook/dockerhub", DockerhubWebhookHandler)
 	r.HandleFunc("/webhook/github", GithubWebhookHandler)
 	r.HandleFunc("/webhook/gitlab", GitlabWebhookHandler)
-	r.HandleFunc("/api/server", getServerStats)
+
+	r.HandleFunc("/api/server", redisHandler.AddTodoHandler).Methods("POST")
+
 	http.ListenAndServe(":"+os.Getenv("NWN_ORDER_PORT"), r)
 	log.WithFields(log.Fields{"Port": os.Getenv("NWN_ORDER_PORT"), "Started": 1}).Info("Order:API")
 }

@@ -1,4 +1,4 @@
-package main
+package log
 
 import (
 	"bytes"
@@ -54,13 +54,6 @@ func popLine(f *os.File) ([]byte, error) {
 	return []byte(line), nil
 }
 
-func initLog() {
-	// app started
-	log.WithFields(log.Fields{"Started": 1}).Info("Order:Log")
-
-	go watchNwnxeeLog()
-}
-
 func watchNwnxeeLog() {
 	t, err := tail.TailFile("/logs/nwnx.txt", tail.Config{Follow: true})
 	for line := range t.Lines {
@@ -76,4 +69,10 @@ func watchNwnxeeLog() {
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 	}
+}
+
+func initLog() {
+	// app started
+	log.WithFields(log.Fields{"Started": 1}).Info("Order:Log")
+	go watchNwnxeeLog()
 }

@@ -5,12 +5,17 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/urothis/nwn-order/go/log"
+
 	log "github.com/sirupsen/logrus"
 )
 
 func initMain() {
 	// app started
 	log.WithFields(log.Fields{"Booted": 1}).Info("Order")
+
+	// grab redis client
+	client := InitRedisClient()
 
 	// start the web stuff
 	go initHTTP()
