@@ -29,11 +29,10 @@ github.com/sirupsen/logrus v1.3.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPx
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.2 h1:bSDNvY7ZPG5RlJ8otE/7V6gMiyenm9RtJ7IUVIAoJ1w=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
-github.com/urothis/nwn-order/go/api v0.0.0-20190204195419-918c3d59bb3a h1:Y/IWHhMhzldmlzktxE2q6XmisVBYC/d3XEkaz+DQHho=
-github.com/urothis/nwn-order/go/api v0.0.0-20190204195419-918c3d59bb3a/go.mod h1:Q5RwXP5mGsOGsZ83nfZ9D6dXUJE5ezEs7o54pbR/M0I=
+github.com/urothis/nwn-order/go/api v0.0.0-20190204210349-77b14cec72e0 h1:IDOvKGa4EmSdBfHzRM0pRFOMOULji/KVHaJrUQoQvj4=
+github.com/urothis/nwn-order/go/api v0.0.0-20190204210349-77b14cec72e0/go.mod h1:ksr9Z5B18HFwSQ9Vo5cgKN2SGpxHDGF8G0mX501Sdv4=
 github.com/urothis/nwn-order/go/log v0.0.0-20190204185925-bed01e80542e h1:YzvhU+Oa+LTVznQD7CpISYSYtLHDxD8C9K7b+lLJIS4=
 github.com/urothis/nwn-order/go/log v0.0.0-20190204185925-bed01e80542e/go.mod h1:pKBrMZo+iUCtN6kL2Ivsd1i0UVvg6hdv9xdwKlFs0PQ=
-github.com/urothis/nwn-order/go/redis v0.0.0-20190204185925-bed01e80542e/go.mod h1:q429Fz+g+0gcHcUV2pdeD18ATYcW+4RZFCvT/lnDzwU=
 github.com/urothis/nwn-order/go/redis v0.0.0-20190204195419-918c3d59bb3a h1:gQYTEox4IB27coFNPlHtYivy9SciaoMmwSHTql7o7eg=
 github.com/urothis/nwn-order/go/redis v0.0.0-20190204195419-918c3d59bb3a/go.mod h1:q429Fz+g+0gcHcUV2pdeD18ATYcW+4RZFCvT/lnDzwU=
 golang.org/x/crypto v0.0.0-20180904163835-0709b304e793 h1:u+LnwYTOOW7Ukr/fppxEb1Nwz0AtPflrblfvUudpo+I=

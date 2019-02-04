@@ -20,7 +20,7 @@ func initHTTP(c *rds.Client) {
 	r.HandleFunc("/webhook/dockerhub", api.DockerhubWebhookHandler)
 	r.HandleFunc("/webhook/github", api.GithubWebhookHandler)
 	r.HandleFunc("/webhook/gitlab", api.GitlabWebhookHandler)
-	r.HandleFunc("/api/server", redisHandler(c, getServerStats(c))).Methods("POST")
+	r.HandleFunc("/api/server", RedisHandler(c, getServerStats(c))).Methods("POST")
 
 	http.ListenAndServe(":"+os.Getenv("NWN_ORDER_PORT"), r)
 	log.WithFields(log.Fields{"Port": os.Getenv("NWN_ORDER_PORT"), "Started": 1}).Info("Order:API")

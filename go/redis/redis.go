@@ -7,7 +7,7 @@ import (
 	"github.com/go-redis/redis"
 )
 
-func redisHandler(c *Client,
+func RedisHandler(c *Client,
 	f func(c *Client, w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { f(c, w, r) })
 }

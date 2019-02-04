@@ -1,14 +1,10 @@
 module github.com/urothis/nwn-order
 
 require (
-	github.com/caarlos0/env v3.5.0+incompatible
-	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/glendc/go-external-ip v0.0.0-20170425150139-139229dcdddd
-	github.com/go-redis/redis v6.14.2+incompatible
-	github.com/google/go-github v17.0.0+incompatible
-	github.com/google/go-querystring v1.0.0 // indirect
-	github.com/jasonlvhit/gocron v0.0.0-20180312192515-54194c9749d4
-	github.com/onsi/gomega v1.4.2 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stretchr/testify v1.2.2 // indirect
+	github.com/bwmarrin/discordgo v0.19.0
+	github.com/gorilla/mux v1.7.0
+	github.com/sirupsen/logrus v1.3.0
+	github.com/urothis/nwn-order/go/log v0.0.0-20190204185925-bed01e80542e
+	github.com/urothis/nwn-order/go/redis v0.0.0-20190204195419-918c3d59bb3a
+
 )
