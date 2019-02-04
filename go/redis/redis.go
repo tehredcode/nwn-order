@@ -1,10 +1,21 @@
-package redis
+package rds
 
 import (
+	"net/http"
 	"os"
 
 	"github.com/go-redis/redis"
 )
+
+// RedisInstance struct
+type RedisInstance struct {
+	RInstance *redis.Client
+}
+
+func redisHandler(c *RedisInstance,
+	f func(c *RedisInstance, w http.ResponseWriter, r *http.Request)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { f(c, w, r) })
+}
 
 // IClient interface
 type IClient interface {
