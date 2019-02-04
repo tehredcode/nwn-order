@@ -9,15 +9,15 @@ import (
 	rds "github.com/urothis/nwn-order/go/redis"
 )
 
-// Server struct
-type Server struct {
+// ServerStats struct
+type ServerStats struct {
 	ModuleName string `json:"modulename,omitempty"`
 	BootTime   string `json:"boottime,omitempty"`
 	BootDate   string `json:"bootdate,omitempty"`
 	Players    string `json:"players,omitempty"`
 }
 
-type server []Server
+type server []ServerStats
 
 // GetServerStats func
 func GetServerStats(c *rds.Client, w http.ResponseWriter, r *http.Request) {
@@ -30,14 +30,8 @@ func GetServerStats(c *rds.Client, w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("%#v", value)
 
 	data := server{
-		Server{ModuleName: os.Getenv("NWN_ORDER_MODULE_NAME")},
-		//Server{BootTime: s[1]},
-		//Server{BootDate: s[2]},
-		//Server{Players: s[3]},
+		ServerStats{ModuleName: os.Getenv("NWN_ORDER_MODULE_NAME")},
 	}
-	json.NewEncoder(w).Encode(data)
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(data)
-
 }

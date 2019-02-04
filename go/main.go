@@ -15,49 +15,40 @@ import (
 	rds "github.com/urothis/nwn-order/go/redis"
 )
 
-package api
-
-import (
-	"log"
-	"net/http"
-	"os"
-
-	"github.com/go-redis/redis"
-	"github.com/gorilla/mux"
-)
-
-type App struct {
-	Router *mux.Router
+type Rds struct {
 	DB     *redis.Client
 }
 
-func (a *App) Run(addr string) {
+func (a *Rds) Run(addr string) {
 	logrus.Fatal(http.ListenAndServe(":8000", a.Router))
 }
 
-func (a *App) InitializeAPI() error {
+func (a *Rds) InitializeAPI() error {
 	db := redis.NewClient(&redis.Options{
 		Addr: os.Getenv("NWN_ORDER_REDIS_HOST") + ":" + os.Getenv("NWN_ORDER_REDIS_PORT"),
 	})
-
-	a.DB = db
-	a.Router = mux.NewRouter()
-	a.initializeRoutes()
 	return nil
 }
 
-func (a *App) initializeRoutes() {
+func (a *Rds) initializeRoutes() {
 	a.Router.HandleFunc("/api/status", a.AddStatusHandler).Methods("GET")
 }
 
 // AddTodoHandler has access to DB, in your case Redis
 // you can replace the steps for Redis.
-func (a *App) AddTodoHandler() {
+func (a *Rds) AddTodoHandler() {
 	//has access to DB
 	a.DB
 }
 
-func initPubsub(a *App) {
+
+
+
+
+
+
+
+func (a *Rds) initPubsub() {
 	p := a.db.PubsubChannel(
 		"Discord:Out",
 		"Log:Debug",
@@ -86,7 +77,7 @@ func initPubsub(a *App) {
 	}
 }
 
-func initDiscord(c *rds.Client) {
+func initDiscord(a *Rds) {
 	logrus.WithFields(logrus.Fields{"BotKey": os.Getenv("NWN_ORDER_PLUGIN_DISCORD_BOT_KEY"), "started": "1"}).Info("Order:Discord")
 	discord, err := discordgo.New("Bot " + os.Getenv("NWN_ORDER_PLUGIN_DISCORD_BOT_KEY"))
 	errCheck("error creating discord session", err)
@@ -144,16 +135,18 @@ func initMain() {
 	client := InitRedisClient()
 	rds := &RedisInstance{rds.Client: &client}
 
-	// start the web stuff
-	go initHTTP(rds)
-	logrus.WithFields(logrus.Fields{"API": 1}).Info("Order")
-
 	// start pubsub
 	go initPubsub(rds)
 	logrus.WithFields(logrus.Fields{"Pubsub": 1}).Info("Order")
 
+	// start the web stuff
+	//go initHTTP(rds)
+	//logrus.WithFields(logrus.Fields{"API": 1}).Info("Order")
+
+
+
 	// start plugins
-	go initPlugins(rds)
+	//go initPlugins(rds)
 }
 
 func main() {
