@@ -7,14 +7,14 @@ import (
 	"github.com/go-redis/redis"
 )
 
-// RedisInstance struct
-type RedisInstance struct {
-	RInstance *redis.Client
+func redisHandler(c *Client,
+	f func(c *Client, w http.ResponseWriter, r *http.Request)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { f(c, w, r) })
 }
 
-func redisHandler(c *RedisInstance,
-	f func(c *RedisInstance, w http.ResponseWriter, r *http.Request)) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { f(c, w, r) })
+// Client struct
+type Client struct {
+	client *redis.Client
 }
 
 // IClient interface
@@ -25,11 +25,6 @@ type IClient interface {
 	HIncrBy(key, field string, incr int64) (int64, error)
 	HGet(key, field string) (string, error)
 	HSet(key, field string, value interface{}) (bool, error)
-}
-
-// Client struct
-type Client struct {
-	client *redis.Client
 }
 
 // InitClient func
