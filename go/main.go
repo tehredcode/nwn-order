@@ -11,9 +11,10 @@ import (
 	"github.com/gorilla/mux"
 	logrus "github.com/sirupsen/logrus"
 	"github.com/urothis/nwn-order/go/log"
+	rds "github.com/urothis/nwn-order/go/redis"
 )
 
-func initHTTP(c *RedisInstance) {
+func initHTTP(c *rds.Client) {
 	r := mux.NewRouter()
 	r.HandleFunc("/webhook/dockerhub", DockerhubWebhookHandler)
 	r.HandleFunc("/webhook/github", GithubWebhookHandler)
@@ -24,14 +25,8 @@ func initHTTP(c *RedisInstance) {
 	log.WithFields(log.Fields{"Port": os.Getenv("NWN_ORDER_PORT"), "Started": 1}).Info("Order:API")
 }
 
-func initPubsub() {
-	addr := os.Getenv("NWN_ORDER_REDIS_HOST") + ":" + os.Getenv("NWN_ORDER_REDIS_PORT")
-	client := InitClient()
-	r := &Client{RInstance: &client}
-
-	defer r.Close()
-
-	pubSub, err := r.Subscribe()
+func initPubsub(c *rds.Client) {
+	pubSub, err := c.Subscribe()
 	err = pubSub.Subscribe(
 		"Discord:Out",
 		"Log:Debug",
@@ -66,7 +61,7 @@ func initPubsub() {
 	}
 }
 
-func initDiscord() {
+func initDiscord(c *rds.Client) {
 	log.WithFields(log.Fields{"BotKey": os.Getenv("NWN_ORDER_PLUGIN_DISCORD_BOT_KEY"), "started": "1"}).Info("Order:Discord")
 	discord, err := discordgo.New("Bot " + os.Getenv("NWN_ORDER_PLUGIN_DISCORD_BOT_KEY"))
 	errCheck("error creating discord session", err)
@@ -99,38 +94,38 @@ func initMain() {
 
 	// grab redis client
 	client := InitRedisClient()
-	redisHandler := &RedisInstance{RInstance: &client}
+	rds := &RedisInstance{rds.Client: &client}
 
 	// start the web stuff
-	go initHTTP()
+	go initHTTP(rds)
 	logrus.WithFields(logrus.Fields{"API": 1}).Info("Order")
 
 	// start pubsub
-	go initPubsub()
+	go initPubsub(rds)
 	logrus.WithFields(logrus.Fields{"Pubsub": 1}).Info("Order")
 
 	// start plugins
-	go initPlugins()
+	go initPlugins(rds)
 }
 
-func initPlugins() {
+func initPlugins(rds *RedisInstance) {
 	if os.Getenv("NWN_ORDER_PLUGIN_DISCORD_ENABLED") == "1" {
 		logrus.WithFields(logrus.Fields{"Enabled": 1}).Info("Order:Discord")
-		go initDiscord()
+		go initDiscord(rds)
 	} else {
 		logrus.WithFields(logrus.Fields{"Enabled": 0}).Info("Order:Discord")
 	}
 
 	if os.Getenv("NWN_ORDER_PLUGIN_HEARTBEAT_ENABLED") == "1" {
 		logrus.WithFields(logrus.Fields{"Enabled": 1}).Info("Order:Heartbeat")
-		go initHeartbeat()
+		go initHeartbeat(rds)
 	} else {
 		logrus.WithFields(logrus.Fields{"Enabled": 0}).Info("Order:Heartbeat")
 	}
 
 	if os.Getenv("NWN_ORDER_PLUGIN_LOG_ENABLED") == "1" {
 		logrus.WithFields(logrus.Fields{"Enabled": 1}).Info("Order:log")
-		go initLog()
+		go initLog(rds)
 	} else {
 		logrus.WithFields(logrus.Fields{"Enabled": 0}).Info("Order:log")
 	}
