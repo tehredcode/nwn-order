@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
+	"github.com/go-redis/redis"
+	rds "github.com/urothis/nwn-order/go/redis"
 )
 
 // Server struct
@@ -17,7 +20,7 @@ type Server struct {
 
 type server []Server
 
-func getServerStats(c *RedisClient, w http.ResponseWriter, r *http.Request) {
+func getServerStats(c *rds.Client, w http.ResponseWriter, r *http.Request) {
 	rkey := os.Getenv("NWN_ORDER_PORT") + ":server"
 	value, _ := c.HMGet(rkey,
 		"BootTime",

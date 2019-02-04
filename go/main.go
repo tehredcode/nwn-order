@@ -10,15 +10,16 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/gorilla/mux"
 	logrus "github.com/sirupsen/logrus"
-	"github.com/urothis/nwn-order/go/log"
+	api "github.com/urothis/nwn-order/go/api"
+	log "github.com/urothis/nwn-order/go/log"
 	rds "github.com/urothis/nwn-order/go/redis"
 )
 
 func initHTTP(c *rds.Client) {
 	r := mux.NewRouter()
-	r.HandleFunc("/webhook/dockerhub", DockerhubWebhookHandler)
-	r.HandleFunc("/webhook/github", GithubWebhookHandler)
-	r.HandleFunc("/webhook/gitlab", GitlabWebhookHandler)
+	r.HandleFunc("/webhook/dockerhub", api.DockerhubWebhookHandler)
+	r.HandleFunc("/webhook/github", api.GithubWebhookHandler)
+	r.HandleFunc("/webhook/gitlab", api.GitlabWebhookHandler)
 	r.HandleFunc("/api/server", redisHandler(c, getServerStats(c))).Methods("POST")
 
 	http.ListenAndServe(":"+os.Getenv("NWN_ORDER_PORT"), r)

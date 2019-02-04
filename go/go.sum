@@ -6,6 +6,8 @@ github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/go-redis/redis v6.14.2+incompatible h1:UE9pLhzmWf+xHNmZsoccjXosPicuiNaInPgym8nzfg0=
 github.com/go-redis/redis v6.14.2+incompatible/go.mod h1:NAIEuMOZ/fxfXJIrKDQDz8wamY7mA7PouImQ2Jvg6kA=
+github.com/go-redis/redis v6.15.1+incompatible h1:BZ9s4/vHrIqwOb0OPtTQ5uABxETJ3NRuUNoSUurnkew=
+github.com/go-redis/redis v6.15.1+incompatible/go.mod h1:NAIEuMOZ/fxfXJIrKDQDz8wamY7mA7PouImQ2Jvg6kA=
 github.com/golang/protobuf v1.2.0 h1:P3YflyNX/ehuJFLhxviNdFxQPkGK5cDcApsge1SqnvM=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/gorilla/mux v1.7.0 h1:tOSd0UKHQd6urX6ApfOn4XdBMY6Sh1MfxV3kmaazO+U=
@@ -27,10 +29,13 @@ github.com/sirupsen/logrus v1.3.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPx
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.2 h1:bSDNvY7ZPG5RlJ8otE/7V6gMiyenm9RtJ7IUVIAoJ1w=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
+github.com/urothis/nwn-order/go/api v0.0.0-20190204195419-918c3d59bb3a h1:Y/IWHhMhzldmlzktxE2q6XmisVBYC/d3XEkaz+DQHho=
+github.com/urothis/nwn-order/go/api v0.0.0-20190204195419-918c3d59bb3a/go.mod h1:Q5RwXP5mGsOGsZ83nfZ9D6dXUJE5ezEs7o54pbR/M0I=
 github.com/urothis/nwn-order/go/log v0.0.0-20190204185925-bed01e80542e h1:YzvhU+Oa+LTVznQD7CpISYSYtLHDxD8C9K7b+lLJIS4=
 github.com/urothis/nwn-order/go/log v0.0.0-20190204185925-bed01e80542e/go.mod h1:pKBrMZo+iUCtN6kL2Ivsd1i0UVvg6hdv9xdwKlFs0PQ=
-github.com/urothis/nwn-order/go/redis v0.0.0-20190204185925-bed01e80542e h1:x1SB8Kh/E7CbKn/92D2jh5BPBxIjrj7ItjTWYy0kbTk=
 github.com/urothis/nwn-order/go/redis v0.0.0-20190204185925-bed01e80542e/go.mod h1:q429Fz+g+0gcHcUV2pdeD18ATYcW+4RZFCvT/lnDzwU=
+github.com/urothis/nwn-order/go/redis v0.0.0-20190204195419-918c3d59bb3a h1:gQYTEox4IB27coFNPlHtYivy9SciaoMmwSHTql7o7eg=
+github.com/urothis/nwn-order/go/redis v0.0.0-20190204195419-918c3d59bb3a/go.mod h1:q429Fz+g+0gcHcUV2pdeD18ATYcW+4RZFCvT/lnDzwU=
 golang.org/x/crypto v0.0.0-20180904163835-0709b304e793 h1:u+LnwYTOOW7Ukr/fppxEb1Nwz0AtPflrblfvUudpo+I=
 golang.org/x/crypto v0.0.0-20180904163835-0709b304e793/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
@@ -50,6 +55,8 @@ gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/fsnotify.v1 v1.4.7 h1:xOHLXZwVvI9hhs+cLKq5+I5onOuwQLhQwiu63xxlHs4=
 gopkg.in/fsnotify.v1 v1.4.7/go.mod h1:Tz8NjZHkW78fSQdbUxIjBTcgA1z1m8ZHf0WmKUhAMys=
+gopkg.in/go-playground/webhooks.v5 v5.5.0 h1:yAZn5U7KwpZWwjfL8odtYAmPcWCB11XepB7DAttvjzU=
+gopkg.in/go-playground/webhooks.v5 v5.5.0/go.mod h1:LZbya/qLVdbqDR1aKrGuWV6qbia2zCYSR5dpom2SInQ=
 gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 h1:uRGJdciOHaEIrze2W8Q3AKkepLTh2hOroT7a+7czfdQ=
 gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7/go.mod h1:dt/ZhP58zS4L8KSrWDmTeBkI65Dw0HsyUHuEVlX15mw=
 gopkg.in/yaml.v2 v2.2.1/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
