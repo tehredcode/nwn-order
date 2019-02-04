@@ -4,7 +4,6 @@ import (
 	"github.com/go-redis/redis"
 )
 
-
 // ModuleBootTime func
 func ModuleBootTime() string {
 	c := Config{}
