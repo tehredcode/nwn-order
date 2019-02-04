@@ -7,6 +7,7 @@ import (
 	"github.com/go-redis/redis"
 )
 
+// RedisHandler func
 func RedisHandler(c *Client,
 	f func(c *Client, w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { f(c, w, r) })
@@ -14,7 +15,7 @@ func RedisHandler(c *Client,
 
 // Client struct
 type Client struct {
-	client *redis.Client
+	CurrentClient *redis.Client
 }
 
 // IClient interface

@@ -17,13 +17,14 @@ import (
 
 func initHTTP(c *rds.Client) {
 	r := mux.NewRouter()
+
 	r.HandleFunc("/webhook/dockerhub", api.DockerhubWebhookHandler)
 	r.HandleFunc("/webhook/github", api.GithubWebhookHandler)
 	r.HandleFunc("/webhook/gitlab", api.GitlabWebhookHandler)
-	r.HandleFunc("/api/server", RedisHandler(c, getServerStats(c))).Methods("POST")
+	r.HandleFunc("/api/server", rds.redisHandler(client, api.GetServerStats)).Methods("POST")
 
 	http.ListenAndServe(":"+os.Getenv("NWN_ORDER_PORT"), r)
-	log.WithFields(log.Fields{"Port": os.Getenv("NWN_ORDER_PORT"), "Started": 1}).Info("Order:API")
+	logrus.WithFields(logrus.Fields{"Port": os.Getenv("NWN_ORDER_PORT"), "Started": 1}).Info("Order:API")
 }
 
 func initPubsub(c *rds.Client) {
@@ -89,26 +90,6 @@ func initDiscord(c *rds.Client) {
 	<-make(chan struct{})
 }
 
-func initMain() {
-	// app started
-	logrus.WithFields(logrus.Fields{"Booted": 1}).Info("Order")
-
-	// grab redis client
-	client := InitRedisClient()
-	rds := &RedisInstance{rds.Client: &client}
-
-	// start the web stuff
-	go initHTTP(rds)
-	logrus.WithFields(logrus.Fields{"API": 1}).Info("Order")
-
-	// start pubsub
-	go initPubsub(rds)
-	logrus.WithFields(logrus.Fields{"Pubsub": 1}).Info("Order")
-
-	// start plugins
-	go initPlugins(rds)
-}
-
 func initPlugins(rds *RedisInstance) {
 	if os.Getenv("NWN_ORDER_PLUGIN_DISCORD_ENABLED") == "1" {
 		logrus.WithFields(logrus.Fields{"Enabled": 1}).Info("Order:Discord")
@@ -130,6 +111,26 @@ func initPlugins(rds *RedisInstance) {
 	} else {
 		logrus.WithFields(logrus.Fields{"Enabled": 0}).Info("Order:log")
 	}
+}
+
+func initMain() {
+	// app started
+	logrus.WithFields(logrus.Fields{"Booted": 1}).Info("Order")
+
+	// grab redis client
+	client := InitRedisClient()
+	rds := &RedisInstance{rds.Client: &client}
+
+	// start the web stuff
+	go initHTTP(rds)
+	logrus.WithFields(logrus.Fields{"API": 1}).Info("Order")
+
+	// start pubsub
+	go initPubsub(rds)
+	logrus.WithFields(logrus.Fields{"Pubsub": 1}).Info("Order")
+
+	// start plugins
+	go initPlugins(rds)
 }
 
 func main() {

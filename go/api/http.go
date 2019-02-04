@@ -20,7 +20,8 @@ type Server struct {
 
 type server []Server
 
-func getServerStats(c *rds.Client, w http.ResponseWriter, r *http.Request) {
+// GetServerStats func
+func GetServerStats(c *rds.Client, w http.ResponseWriter, r *http.Request) {
 	rkey := os.Getenv("NWN_ORDER_PORT") + ":server"
 	value, _ := c.HMGet(rkey,
 		"BootTime",

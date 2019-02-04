@@ -5,8 +5,6 @@ require (
 	github.com/gorilla/mux v1.7.0
 	github.com/sirupsen/logrus v1.3.0
 	github.com/urothis/nwn-order/go/api v0.0.0-20190204210349-77b14cec72e0
-
-	github.com/urothis/nwn-order/go/log v0.0.0-20190204185925-bed01e80542e
-	github.com/urothis/nwn-order/go/redis v0.0.0-20190204195419-918c3d59bb3a
-
+	github.com/urothis/nwn-order/go/log v0.0.0-20190204210349-77b14cec72e0
+	github.com/urothis/nwn-order/go/redis v0.0.0-20190204210349-77b14cec72e0
 )
