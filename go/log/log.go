@@ -71,7 +71,8 @@ func watchNwnxeeLog() {
 	}
 }
 
-func initLog() {
+// InitLog func
+func InitLog() {
 	// app started
 	log.WithFields(log.Fields{"Started": 1}).Info("Order:Log")
 	go watchNwnxeeLog()
