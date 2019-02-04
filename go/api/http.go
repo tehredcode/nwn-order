@@ -5,10 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-
-	"github.com/gorilla/mux"
-	log "github.com/sirupsen/logrus"
-	"github.com/urothis/nwn-order/go/redis"
 )
 
 // Server struct
@@ -46,21 +42,4 @@ func getServerStats(c *RedisClient, w http.ResponseWriter, r *http.Request) {
 func redisHandler(c *redis.Client,
 	f func(c *redis.Client, w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { f(c, w, r) })
-}
-
-func initHTTP() {
-	//Initialize Redis Client
-	client := redis.InitClient()
-	//Get current redis instance to get passed to different Gorilla-Mux Handlers
-	redisHandler := &RedisInstance{RInstance: &client}
-
-	r := mux.NewRouter()
-	r.HandleFunc("/webhook/dockerhub", DockerhubWebhookHandler)
-	r.HandleFunc("/webhook/github", GithubWebhookHandler)
-	r.HandleFunc("/webhook/gitlab", GitlabWebhookHandler)
-
-	r.HandleFunc("/api/server", redisHandler.AddTodoHandler).Methods("POST")
-
-	http.ListenAndServe(":"+os.Getenv("NWN_ORDER_PORT"), r)
-	log.WithFields(log.Fields{"Port": os.Getenv("NWN_ORDER_PORT"), "Started": 1}).Info("Order:API")
 }

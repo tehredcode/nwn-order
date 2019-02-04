@@ -6,7 +6,7 @@ import (
 	"github.com/go-redis/redis"
 )
 
-// IRedisClient interface
+// IClient interface
 type IClient interface {
 	HMGet(key string, fields ...string) (string, error)
 	HMSet(key string, fields map[string]interface{}) (string, error)
@@ -16,14 +16,14 @@ type IClient interface {
 	HSet(key, field string, value interface{}) (bool, error)
 }
 
-// RedisClient struct
+// Client struct
 type Client struct {
 	client *redis.Client
 }
 
-// InitRedisClient func
-func InitClient() IRedisClient {
-	return &RedisClient{client: redis.NewClient(&redis.Options{
+// InitClient func
+func InitClient() IClient {
+	return &Client{client: redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("NWN_ORDER_REDIS_HOST"),
 		Password: os.Getenv("NWN_ORDER_REDIS_PW"),
 		DB:       0, // use default DB
@@ -31,7 +31,7 @@ func InitClient() IRedisClient {
 }
 
 // HMGet func
-func (c *RedisClient) HMGet(key string, fields ...string) (string, error) {
+func (c *Client) HMGet(key string, fields ...string) (string, error) {
 	var result string
 	response, err := c.client.HMGet(key, fields...).Result()
 	if err == nil && response != nil && len(response) > 0 && response[0] != nil {
@@ -42,7 +42,7 @@ func (c *RedisClient) HMGet(key string, fields ...string) (string, error) {
 }
 
 // HMSet func
-func (c *RedisClient) HMSet(key string, fields map[string]interface{}) (string, error) {
+func (c *Client) HMSet(key string, fields map[string]interface{}) (string, error) {
 	var result string
 
 	response, err := c.client.HMSet(key, fields).Result()
@@ -55,7 +55,7 @@ func (c *RedisClient) HMSet(key string, fields map[string]interface{}) (string, 
 }
 
 // HDel func
-func (c *RedisClient) HDel(key string, fields ...string) (int64, error) {
+func (c *Client) HDel(key string, fields ...string) (int64, error) {
 	var result int64
 
 	response, err := c.client.HDel(key, fields...).Result()
@@ -68,7 +68,7 @@ func (c *RedisClient) HDel(key string, fields ...string) (int64, error) {
 }
 
 // HIncrBy func
-func (c *RedisClient) HIncrBy(key, field string, incr int64) (int64, error) {
+func (c *Client) HIncrBy(key, field string, incr int64) (int64, error) {
 	var result int64
 
 	response, err := c.client.HIncrBy(key, field, incr).Result()
@@ -81,7 +81,7 @@ func (c *RedisClient) HIncrBy(key, field string, incr int64) (int64, error) {
 }
 
 // HGet func
-func (c *RedisClient) HGet(key string, field string) (string, error) {
+func (c *Client) HGet(key string, field string) (string, error) {
 	var result string
 	result, err := c.client.HGet(key, field).Result()
 
@@ -93,7 +93,7 @@ func (c *RedisClient) HGet(key string, field string) (string, error) {
 }
 
 // HSet func
-func (c *RedisClient) HSet(key string, field string, value interface{}) (bool, error) {
+func (c *Client) HSet(key string, field string, value interface{}) (bool, error) {
 	var result bool
 
 	result, err := c.client.HSet(key, field, value).Result()
