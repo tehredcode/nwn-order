@@ -62,14 +62,15 @@ func initLog() {
 }
 
 func watchNwnxeeLog() {
-	fname := `/logs/nwnx.txt`
 	t, err := tail.TailFile("/logs/nwnx.txt", tail.Config{Follow: true})
 	for line := range t.Lines {
-		log.WithFields(log.Fields{"Line": line.Text}).Info("Order:Log:Nwnxee:")
-		f, _ := os.OpenFile(fname, os.O_RDWR|os.O_CREATE, 0666)
+		// this is where the nwnx log parsing will go.
+
+		//
+		log.WithFields(log.Fields{"Line": line.Text, "Time": line.Time}).Info("Order:Log:Nwnxee:")
+		f, _ := os.OpenFile("/logs/nwnx.txt", os.O_RDWR|os.O_CREATE, 0666)
 		defer f.Close()
-		line, _ := popLine(f)
-		fmt.Println("pop:", string(line))
+		popLine(f)
 	}
 
 	if err != nil {
