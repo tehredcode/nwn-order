@@ -45,7 +45,7 @@ func InitAPI() {
 		c := pool.Get()
 		defer c.Close()
 
-		k := "Order:server"
+		k := "order:server"
 		value1 := "Order"
 		value2, err := redis.String(c.Do("HGET", k, "BootTime"))
 		value3, err := redis.String(c.Do("HGET", k, "BootDate"))
