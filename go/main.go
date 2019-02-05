@@ -45,13 +45,6 @@ func (a *Rds) AddTodoHandler() {
 	a.DB
 }
 
-
-
-
-
-
-
-
 func (a *Rds) initPubsub() {
 	p := a.db.PubsubChannel(
 		"Discord:Out",
@@ -81,7 +74,7 @@ func (a *Rds) initPubsub() {
 	}
 }
 
-func initDiscord(a *Rds) {
+func (a *Rds) initDiscord() {
 	logrus.WithFields(logrus.Fields{"BotKey": os.Getenv("NWN_ORDER_PLUGIN_DISCORD_BOT_KEY"), "started": "1"}).Info("Order:Discord")
 	discord, err := discordgo.New("Bot " + os.Getenv("NWN_ORDER_PLUGIN_DISCORD_BOT_KEY"))
 	errCheck("error creating discord session", err)
@@ -137,13 +130,15 @@ func initMain() {
 
 	// grab redis client
 	client := InitRedisClient()
-	rds := &RedisInstance{rds.Client: &client}
+	rds := &RedisInstance{Client: &client}
 
 	// start pubsub
 	go initPubsub(rds)
 	logrus.WithFields(logrus.Fields{"Pubsub": 1}).Info("Order")
 
-	// start the web stuff
+	// Init the api
+	InitializeAPI()
+
 	//go initHTTP(rds)
 	//logrus.WithFields(logrus.Fields{"API": 1}).Info("Order")
 
