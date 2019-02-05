@@ -16,6 +16,7 @@ import (
 )
 
 type Rds struct {
+	Router *mux.Router
 	DB     *redis.Client
 }
 

@@ -1,12 +1,10 @@
-package api
+package main
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
-
-	rds "github.com/urothis/nwn-order/go/redis"
 )
 
 // ServerStats struct
@@ -20,9 +18,9 @@ type ServerStats struct {
 type server []ServerStats
 
 // GetServerStats func
-func GetServerStats(c *rds.Client, w http.ResponseWriter, r *http.Request) {
+func GetServerStats(a *order.Rds, w http.ResponseWriter, r *http.Request) {
 	rkey := os.Getenv("NWN_ORDER_PORT") + ":server"
-	value, _ := c.HMGet(rkey,
+	value, _ := a.HMGet(rkey,
 		"BootTime",
 		"BootDate",
 		"Online",
