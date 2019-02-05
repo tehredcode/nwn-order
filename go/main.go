@@ -54,7 +54,16 @@ func InitAPI() {
 	redisPool = newPool(addr)
 	defer redisPool.Close()
 
-	m := martini.Classic()
+	// this is prolly worst practice
+	// should disable martini logging
+	r := martini.NewRouter()
+	mn := martini.New()
+	mn.Use(martini.Recovery())
+	mn.Use(martini.Static("public"))
+	mn.MapTo(r, (*martini.Routes)(nil))
+	mn.Action(r.Handle)
+	m := &martini.ClassicMartini{mn, r}
+
 	m.Map(redisPool)
 	m.Use(render.Renderer())
 	m.Get("/", func() string {
@@ -76,6 +85,7 @@ func InitAPI() {
 				"status":  "ERR",
 				"message": message})
 		} else {
+			log.WithFields(log.Fields{"Path": "/stats", "BootDate": v1, "BootTime": v2, "ModuleName": v3, "Online": v4}).Info("Order:API")
 			r.JSON(200, map[string]interface{}{
 				"status":     "OK",
 				"BootDate":   v1,
