@@ -15,15 +15,18 @@ import (
 	rds "github.com/urothis/nwn-order/go/redis"
 )
 
+// Rds struct
 type Rds struct {
 	Router *mux.Router
 	DB     *redis.Client
 }
 
+// Run func
 func (a *Rds) Run(addr string) {
 	logrus.Fatal(http.ListenAndServe(":8000", a.Router))
 }
 
+// InitializeAPI func
 func (a *Rds) InitializeAPI() error {
 	db := redis.NewClient(&redis.Options{
 		Addr: os.Getenv("NWN_ORDER_REDIS_HOST") + ":" + os.Getenv("NWN_ORDER_REDIS_PORT"),
