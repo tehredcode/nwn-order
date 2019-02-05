@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/caarlos0/env"
-	"github.com/glendc/go-external-ip"
+	externalip "github.com/glendc/go-external-ip"
 	"github.com/go-redis/redis"
 	"github.com/google/go-github/github"
 	"github.com/jasonlvhit/gocron"
