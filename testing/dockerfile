@@ -3,7 +3,6 @@ COPY . .
 RUN apt update \
     && apt upgrade -y \
     && rm -r /var/lib/apt/lists /var/cache/apt \
-    && ls \
     && cd go \
     && go mod download \
     && go build -o ./bin/order \

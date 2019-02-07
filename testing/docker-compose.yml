@@ -7,16 +7,12 @@ services:
     hostname: redis
     volumes:
       - ${PWD-.}/redis:/data
-    networks:
-      - redis-net
     restart: always
     ports:
       - "6379:6379"
   nwserver:
     hostname: nwserver
-    image: urothis/nwn-order:dev-module
-    networks:
-      - redis-net    
+    image: urothis/nwn-order:dev-module  
     links:
       - "nwn-order:nwn-order"
       - "redis:redis"
@@ -37,27 +33,20 @@ services:
     stdin_open: true
     tty: true
     restart: always
-    networks:
-      - redis-net
     links:
       - "redis:redis"
     ports:
-      - "3000:3000"
+      - "5750:5750"
     volumes:
       - ${PWD-.}/logs:/logs/
   redis-commander:
     container_name: redis-commander
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
-    restart: always
-    networks:
-      - redis-net   
+    restart: always 
     links:
       - "redis:redis"
     environment:
     - REDIS_HOSTS=local:redis:6379
     ports:
     - "8081:8081"
-
-networks:
-  redis-net:
