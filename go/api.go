@@ -36,7 +36,8 @@ type ServerStats struct {
 
 // api stats
 func apiStats(w http.ResponseWriter, r *http.Request) {
-	k := "order:server"
+	p := os.Getenv("NWN_ORDER_MODULE_NAME")
+	k := p + ":server"
 	v1, err := hgetRediskeyString(k, "BootDate")
 	v2, err := hgetRediskeyString(k, "BootTime")
 	v3, err := hgetRediskeyString(k, "ModuleName")
@@ -50,6 +51,7 @@ func apiStats(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
 }

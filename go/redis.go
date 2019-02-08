@@ -52,6 +52,42 @@ func newPool(server string) *redis.Pool {
 	}
 }
 
+func initPubsub() {
+	r := RedisPool.Get()
+	rps := redis.PubSubConn{Conn: r}
+
+	rps.Subscribe(
+		"Discord:Out",
+		"Log:Debug",
+		"Log:Info",
+		"Log:Warning",
+		"Log:Fatal",
+	)
+
+	log.WithFields(log.Fields{"Discord:Out": "1", "Log:Debug": "1", "Log:Info": "1", "Log:Warning": "1", "Log:Fatal": "1"}).Info("Order:Redis:Pubsub:Subscribe")
+	for {
+		switch msg := rps.Receive().(type) {
+		case redis.Message:
+			switch msg.Channel {
+			case "Discord:Out":
+				log.WithFields(log.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Data}).Info("Order:Pubsub")
+			case "Log:Debug":
+				log.WithFields(log.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Data}).Info("Order:Pubsub")
+			case "Log:Info":
+				log.WithFields(log.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Data}).Info("Order:Pubsub")
+			case "Log:Warning":
+				log.WithFields(log.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Data}).Info("Order:Pubsub")
+			case "Log:Fatal":
+				log.WithFields(log.Fields{"Pubsub": "1", "Channel": msg.Channel, "Message": msg.Data}).Info("Order:Pubsub")
+			}
+		case redis.Subscription:
+			{
+				log.WithFields(log.Fields{"Channel": msg.Channel}).Info("Order:Redis:Pubsub:Subscribe")
+			}
+		}
+	}
+}
+
 func sendPubsub(LogMessage string, PubsubChannel string, PubsubMessage string) {
 	r := RedisPool.Get()
 	err := r.Send(PubsubChannel, PubsubMessage)

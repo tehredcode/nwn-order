@@ -13,15 +13,6 @@ var (
 	botKey        string
 )
 
-func mapSubexpNames(m, n []string) map[string]string {
-	m, n = m[1:], n[1:]
-	r := make(map[string]string, len(m))
-	for i := range n {
-		r[n[i]] = m[i]
-	}
-	return r
-}
-
 func initDiscord() {
 	log.WithFields(log.Fields{"BotKey": os.Getenv("NWN_ORDER_DISCORD_BOT_KEY"), "started": "1"}).Info("Order:Discord")
 	discord, err := discordgo.New("Bot " + os.Getenv("NWN_ORDER_DISCORD_BOT_KEY"))
@@ -58,13 +49,14 @@ func errCheck(msg string, err error) {
 
 func replyHandler(discord *discordgo.Session, message *discordgo.MessageCreate) {
 	user := message.Author
+
 	if user.ID == botID || user.Bot {
 		//Do nothing because the bot is talking
 		return
 	}
 
-	if message.ChannelID == os.Getenv("NWN_ORDER_DISCORD_BOT_ROOM") {
-		sendPubsub(message.ChannelID, "Discord:Out", "["+message.Author.Username+"] "+message.Content)
+	if message.ChannelID == os.Getenv("NWN_ORDER_DISCORD_PUBLIC_BOT_ROOM") {
+		sendPubsub(message.ChannelID, "Discord:In", "["+message.Author.Username+"] "+message.Content)
 		log.WithFields(log.Fields{"Message Content": message.Content, "Message": message.Message, "Author": message.Author}).Info("Order:Discord:Message")
 		return
 	}

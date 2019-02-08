@@ -18,5 +18,4 @@ RUN apt-get update \
     && apt-get clean \
     && mkdir logs \
     && chmod +x ./usr/local/bin/order
-    
 ENTRYPOINT [ "order" ]

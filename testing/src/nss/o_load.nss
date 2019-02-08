@@ -1,8 +1,10 @@
 #include "nwnx_time"
+#include "nwnx_chat"
 #include "o_inc"
-#include "o_external"
 
 void InitOrder() {
+  NWNX_Chat_RegisterChatScript(o_chat);
+
   // random server values we want
   string sBootTime = NWNX_Time_GetSystemTime();
   string sBootDate = NWNX_Time_GetSystemDate();

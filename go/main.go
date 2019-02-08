@@ -13,6 +13,7 @@ func initMain() {
 	// app started
 	log.WithFields(log.Fields{"Booted": 1}).Info("Order")
 	go InitAPI()
+	go initPubsub()
 	go initPlugins()
 }
 

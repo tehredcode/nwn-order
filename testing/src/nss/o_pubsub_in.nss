@@ -20,7 +20,7 @@ void main() {
       OrderHeartbeat(StringToInt(data.message));
       break;
     case 2:
-      //OrderIncomingDiscord(data.message);
+      OrderIncomingDiscord(data.message);
       break;
     default:
       break;
