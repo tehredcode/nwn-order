@@ -60,7 +60,6 @@ func apiStats(w http.ResponseWriter, r *http.Request) {
 
 // InitAPI func
 func InitAPI() {
-	log.Println("server started")
 
 	m := mux.NewRouter()
 
@@ -73,10 +72,6 @@ func InitAPI() {
 		m.HandleFunc("/webhook/Github", GithubWebhookHandler)
 		m.HandleFunc("/webhook/Gitlab", GitlabWebhookHandler)
 	}
-
-	addr := "redis:" + os.Getenv("NWN_ORDER_REDIS_PORT")
-	RedisPool = newPool(addr)
-	defer RedisPool.Close()
 
 	log.Println("API started: " + os.Getenv("NWN_ORDER_PORT"))
 	http.ListenAndServe(":"+os.Getenv("NWN_ORDER_PORT"), m)

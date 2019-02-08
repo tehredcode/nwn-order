@@ -52,10 +52,14 @@ func newPool(server string) *redis.Pool {
 	}
 }
 
-func initPubsub() {
-	r := RedisPool.Get()
-	rps := redis.PubSubConn{Conn: r}
+// InitRedis func
+func InitRedis() {
+	addr := "redis:" + os.Getenv("NWN_ORDER_REDIS_PORT")
+	RedisPool = newPool(addr)
 
+	log.Println("Redis started: " + os.Getenv("NWN_ORDER_REDIS_PORT"))
+
+	rps := redis.PubSubConn{Conn: RedisPool.Get()}
 	rps.Subscribe(
 		"Discord:Out",
 		"Log:Debug",
@@ -64,7 +68,6 @@ func initPubsub() {
 		"Log:Fatal",
 	)
 
-	log.WithFields(log.Fields{"Discord:Out": "1", "Log:Debug": "1", "Log:Info": "1", "Log:Warning": "1", "Log:Fatal": "1"}).Info("Order:Redis:Pubsub:Subscribe")
 	for {
 		switch msg := rps.Receive().(type) {
 		case redis.Message:
